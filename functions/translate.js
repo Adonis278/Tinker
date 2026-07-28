@@ -31,8 +31,15 @@ export function writeLanguageFor(code) {
   return strategyFor(code) === "pivot" ? "English" : (names[code] ?? "English");
 }
 
+/** Treat empty and the "unset" placeholder as "no key configured". */
+function usable(apiKey) {
+  return Boolean(apiKey) && apiKey !== "unset";
+}
+
 export async function translate(text, target, apiKey) {
-  if (!apiKey) return { text, translated: false };
+  // No key yet? Return the English text untouched rather than failing the
+  // learner. `translated: false` tells the UI not to claim a translation.
+  if (!usable(apiKey)) return { text, translated: false };
   try {
     const res = await fetch(`${ENDPOINT}?key=${apiKey}`, {
       method: "POST",

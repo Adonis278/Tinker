@@ -18,7 +18,9 @@ const NVIDIA_API_KEY = defineSecret("NVIDIA_API_KEY");
 const GOOGLE_TRANSLATE_API_KEY = defineSecret("GOOGLE_TRANSLATE_API_KEY");
 
 export const tutor = onRequest(
-  { cors: true, secrets: [NVIDIA_API_KEY, GOOGLE_TRANSLATE_API_KEY], timeoutSeconds: 60, memory: "256MiB" },
+  // 120s is headroom, not a target: the chain abandons each model after 10s,
+  // so a full 4-model walk plus a translate hop still lands well inside this.
+  { cors: true, secrets: [NVIDIA_API_KEY, GOOGLE_TRANSLATE_API_KEY], timeoutSeconds: 120, memory: "256MiB" },
   async (req, res) => {
     if (req.method !== "POST") {
       res.status(405).json({ error: "POST only" });
