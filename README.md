@@ -23,9 +23,11 @@ fake storage, no Firebase, no API key. **Do not wait for anyone to set anything 
 you start building.**
 
 Then read, in this order:
-1. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — the contracts. 10 minutes. Non-negotiable.
-2. **Your own task file** in `docs/tasks/`.
-3. [CONTRIBUTING.md](CONTRIBUTING.md) — branch + PR rules.
+1. **[docs/DESIGN.md](docs/DESIGN.md)** — how the system works, what you build, and your
+   commit-by-commit plan. Read this one as a team at kickoff.
+2. **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — the frozen contracts. 10 minutes. Non-negotiable.
+3. **Your own task file** in `docs/tasks/` — quick reference while you work.
+4. [CONTRIBUTING.md](CONTRIBUTING.md) — branch + PR rules.
 
 ---
 
@@ -33,12 +35,12 @@ Then read, in this order:
 
 > **Adoni: confirm or swap these four names before kickoff, then delete this line.**
 
-| Role | Person | GitHub | Task brief |
-|---|---|---|---|
-| P1 — Frontend / UX | *(assign)* | `AfricanTobacco` | [P1-frontend.md](docs/tasks/P1-frontend.md) |
-| P2 — AI Engineering | *(assign)* | `mansmako` | [P2-ai-engineering.md](docs/tasks/P2-ai-engineering.md) |
-| P3 — Content + Game Logic | *(assign)* | `Donnovan99` | [P3-content-gamification.md](docs/tasks/P3-content-gamification.md) |
-| P4 — Platform + Pitch | Adoni | *(owner)* | [P4-platform-pitch.md](docs/tasks/P4-platform-pitch.md) |
+| Role | Person | GitHub | Brief | Commit plan |
+|---|---|---|---|---|
+| P1 — Frontend / UX | *(assign)* | `AfricanTobacco` | [P1](docs/tasks/P1-frontend.md) | [DESIGN §4](docs/DESIGN.md#4-p1--frontend--ux) |
+| P2 — AI Engineering | *(assign)* | `mansmako` | [P2](docs/tasks/P2-ai-engineering.md) | [DESIGN §5](docs/DESIGN.md#5-p2--ai-engineering) |
+| P3 — Content + Game Logic | *(assign)* | `Donnovan99` | [P3](docs/tasks/P3-content-gamification.md) | [DESIGN §6](docs/DESIGN.md#6-p3--content--game-logic) |
+| P4 — Platform + Pitch | Adoni | `Adonis278` | [P4](docs/tasks/P4-platform-pitch.md) | [DESIGN §7](docs/DESIGN.md#7-p4--platform--pitch) |
 
 Everything in the repo refers to **roles (P1–P4), not names**, so swapping people is a
 one-line edit to this table.
