@@ -11,25 +11,38 @@ shapes are frozen. P1 is already building against them using the mock.
 
 ---
 
-## Hour one: three things, in this order
+## The plumbing is already done — skip straight to the prompt
 
-### 1. Get an NVIDIA API key
-https://build.nvidia.com → sign in → generate an API key (starts `nvapi-`). Free tier.
+P4 has completed what used to be your first three tasks. **Do not redo them:**
 
-### 2. Verify the model IDs
-`functions/models.js` has a chain of five model IDs. **NVIDIA rotates its catalogue — assume
-at least one is stale.** Check each against build.nvidia.com and fix the strings. A wrong ID
-fails with a 404 and silently drops you down the chain, which is easy to miss.
+- **API key** — set in Secret Manager as `NVIDIA_API_KEY`. For local work, copy
+  `functions/.env.example` to `functions/.secret.local` and paste the key (ask Adoni).
+- **Hosting decision** — the project is on **Blaze**, so Cloud Functions can call NVIDIA
+  directly. No Cloudflare Worker needed.
+- **Endpoint deployed and working** — `https://us-central1-tinkersas.cloudfunctions.net/tutor`
+  returns real Kiswahili Socratic replies with a working interest anchor.
+- **Model chain verified** — four of the original five IDs were dead. See the rejected list
+  in `functions/models.js`.
 
-### 3. Confirm where this deploys — talk to P4 now
-Firebase Cloud Functions **cannot call third-party APIs on the free Spark plan.** Either P4
-upgrades to Blaze (~$0 at our scale) or the tutor moves to a Cloudflare Worker. Don't
-discover this at hour six. `functions/tutor-core.js` is deliberately platform-agnostic so
-either works.
+Re-check the chain at the start of each session, because free-tier capacity moves hour to hour:
+
+```bash
+node scripts/verify-models.mjs
+```
+
+If the primary model is timing out, reorder the chain — that is config, not code.
+
+### Two known issues to start on
+
+1. **Language adherence is inconsistent.** When the primary model is under load, replies come
+   back in English even though `nativeLanguage` is `sw`. The instruction is in the system
+   prompt but is being ignored under pressure. Make it impossible to miss.
+2. **Latency is 6–16s.** Acceptable but not good. Some of it is model choice, some is prompt
+   length. See what you can trim without losing anchor quality.
 
 ---
 
-## Then: the actual work
+## The actual work
 
 ### The prompt is the product
 `functions/prompts.js` is written and structured. It is a starting point, not a finished
