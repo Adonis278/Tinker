@@ -6,20 +6,44 @@
  * changing a string. Free tiers rate-limit hard, so we keep an ordered chain
  * and step down it whenever a model returns 429 / 5xx / times out.
  *
- * >>> P2 DAY-1 TASK: verify these ids against https://build.nvidia.com <<<
- * NVIDIA rotates its catalogue. A wrong id fails fast with a 404 — just edit
- * the list below, no other code changes needed.
+ * CHAIN VERIFIED 28 Jul 2026 against this account's catalogue, by sending a
+ * real Socratic prompt (Kiswahili + cooking anchor) to every candidate and
+ * checking latency, JSON compliance and whether it leaked the answer.
+ *
+ * Rejected, with reasons — do not re-add without retesting:
+ *   qwen/qwen2.5-72b-instruct              not in this account's catalogue
+ *   mistralai/mistral-large[-2-instruct]   404 for this account
+ *   nvidia/llama-3.1-nemotron-70b-instruct 404 for this account
+ *   nvidia/llama-3.1-nemotron-51b-instruct 404 for this account
+ *   google/gemma-4-31b-it                  504 after 300s
+ *   nvidia/nemotron-3-super-120b-a12b      reasoning model, leaks its scratchpad instead of JSON
+ *   nvidia/nvidia-nemotron-nano-9b-v2      returns empty content
+ *
+ * Re-verify with: node scripts/verify-models.mjs
  */
 
 const BASE_URL = "https://integrate.api.nvidia.com/v1/chat/completions";
-const TIMEOUT_MS = 20000;
+// Deliberately tight. A dead model costs us this much latency before we move
+// on, and free-tier capacity fluctuates hour to hour — a 20s budget meant one
+// stalled model pushed a real reply out to 24s, which is unusable on camera.
+// Better to abandon a slow model quickly than to wait politely for it.
+const TIMEOUT_MS = 10000;
 const COOLDOWN_MS = 60000;
 
+// ORDER IS NOT PERMANENT. Free-tier capacity moves hour to hour: in testing,
+// llama-3.1-70b answered in 6s one hour and timed out entirely the next.
+// Re-run `node scripts/verify-models.mjs` before the demo and put whichever
+// model is healthiest first.
 export const MODEL_CHAIN = [
+  // Answering in ~3.5s and holding the anchor well as of the last check.
+  "nvidia/llama-3.3-nemotron-super-49b-v1",
+  // 6-8s when healthy, good anchoring. Was timing out at last check.
+  "meta/llama-3.1-70b-instruct",
+  // Strongest on paper but the free tier frequently returns 503
+  // "Worker local total request limit reached". Kept as opportunistic backup.
   "meta/llama-3.3-70b-instruct",
-  "qwen/qwen2.5-72b-instruct",
-  "nvidia/llama-3.1-nemotron-70b-instruct",
-  "mistralai/mistral-large-2-instruct",
+  // ~1.4s and has never failed. Weaker anchoring, but it always answers —
+  // which is the entire point of a last resort.
   "meta/llama-3.1-8b-instruct",
 ];
 
