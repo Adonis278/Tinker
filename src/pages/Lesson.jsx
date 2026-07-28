@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import lessons from "../data/lessons.sample.json";
 import { getUser, saveUser, saveProgress } from "../lib/store.js";
@@ -20,6 +20,15 @@ export default function Lesson() {
   const [submitted, setSubmitted] = useState(false);
   const [tutorOpen, setTutorOpen] = useState(false);
   const [activeMisconception, setActiveMisconception] = useState(null);
+
+  // Analytics owned by P4 — the taxonomy lives in src/firebase.js.
+  useEffect(() => {
+    if (!user) return;
+    const anchor = user.interests?.find((i) => lesson.anchorPrompts[i]) ?? "cooking";
+    track("lesson_start", { lessonId: lesson.id });
+    track("anchor_used", { lessonId: lesson.id, anchor });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson.id]);
 
   if (!user) return <div className="p-5">Please complete onboarding first.</div>;
 
@@ -43,6 +52,7 @@ export default function Lesson() {
     });
 
     track("quiz_submit", { lessonId: lesson.id, score: correct / lesson.quiz.length, misconception: missed });
+    track("lesson_complete", { lessonId: lesson.id, score: correct / lesson.quiz.length, xpAwarded: xp });
     setSubmitted(true);
     if (missed) {
       setActiveMisconception(missed);
