@@ -8,6 +8,8 @@ refuses to hand out answers.
 
 Built by **Spiritus Agentic Solutions** for the AI/ML in Education hackathon.
 
+**Live:** https://tinkersas.web.app
+
 ---
 
 ## Start here (5 minutes, no accounts, no API keys)
