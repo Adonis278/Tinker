@@ -1,0 +1,67 @@
+[
+  {
+    "id": "algebra-01",
+    "order": 1,
+    "title": "What a Variable Really Is",
+    "conceptId": "variable-as-unknown",
+    "conceptSummary": "A variable is a placeholder for a quantity we do not know yet. Solving for it means using the relationships we DO know to pin down its value. The equals sign is a promise that both sides are worth the same.",
+    "bodyMd": "A letter like **x** is not scary maths. It is just a box with something hidden inside.\n\nThe equation tells you the *rules* the hidden thing obeys. Your job is to use those rules to open the box.",
+    "anchorPrompts": {
+      "cooking": "You know a pot of stew needs a certain amount of salt, but the recipe card is smudged. Everything else you know: it feeds 6, and it took 3 spoons of oil. The smudged number is your x.",
+      "football": "A striker finished the season on 24 goals across all competitions. You know he got 15 in the league. The cup tally is the number you're missing — that's your x.",
+      "music": "A bar has 4 beats. You can hear 3 of them clearly and one is buried in the mix. The buried beat is x — and the bar's total tells you exactly what it must be.",
+      "farming": "You harvested 40 bags from three fields. Two fields gave 15 and 12. The third field's yield is your x."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "In the equation x + 15 = 24, what does x represent?",
+        "options": [
+          "A number we already know",
+          "A quantity we are trying to find",
+          "The answer to the whole equation",
+          "A mistake in the maths"
+        ],
+        "answerIdx": 1,
+        "misconceptionMap": {
+          "0": "var-is-known",
+          "2": "var-is-the-answer",
+          "3": "var-is-error"
+        }
+      },
+      {
+        "id": "q2",
+        "prompt": "To solve x + 15 = 24, what should you do?",
+        "options": [
+          "Add 15 to both sides",
+          "Subtract 15 from the left side only",
+          "Subtract 15 from both sides",
+          "Multiply both sides by 15"
+        ],
+        "answerIdx": 2,
+        "misconceptionMap": {
+          "0": "wrong-inverse-operation",
+          "1": "one-sided-operation",
+          "3": "wrong-inverse-operation"
+        }
+      }
+    ],
+    "misconceptions": [
+      {
+        "id": "one-sided-operation",
+        "description": "Learner changes only one side of the equation, breaking the balance.",
+        "signal": "Applies an operation to the left side but leaves the right side untouched."
+      },
+      {
+        "id": "wrong-inverse-operation",
+        "description": "Learner uses the same operation instead of the inverse one.",
+        "signal": "Adds when they should subtract, or multiplies when they should divide."
+      },
+      {
+        "id": "var-is-the-answer",
+        "description": "Learner thinks the letter x IS the final answer rather than a placeholder for it.",
+        "signal": "Says x is the answer instead of the unknown quantity."
+      }
+    ]
+  }
+]
