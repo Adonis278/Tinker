@@ -1,16 +1,21 @@
 /**
  * OWNER: P4 (Platform).
  *
- * Deliberately inert while VITE_USE_MOCKS=true so the app runs with zero setup.
- * P4 fills in .env, flips the flag, and wires store.js to these exports.
+ * Firebase init, anonymous auth, and the single analytics entry point.
+ * Stays inert while the storage layer is mocked, so a fresh clone with no
+ * .env still runs.
+ *
+ * Note on the web apiKey: Firebase web config is PUBLIC by design — it ships
+ * in the browser bundle of every Firebase app and identifies the project, it
+ * does not grant access. The real security boundary is firestore.rules.
+ * Server-side secrets (NVIDIA, Translate) live in functions/.env and never here.
  */
 
 import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported, logEvent } from "firebase/analytics";
-
-const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== "false";
+import { MOCK_STORE } from "./lib/env.js";
 
 const config = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -22,36 +27,64 @@ const config = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
+const configured = Boolean(config.apiKey && config.projectId);
+export const live = !MOCK_STORE && configured;
+
 export let app = null;
 export let auth = null;
 export let db = null;
 let analytics = null;
 
-if (!USE_MOCKS) {
+if (live) {
   app = initializeApp(config);
   auth = getAuth(app);
   db = getFirestore(app);
-  isSupported().then((ok) => {
-    if (ok) analytics = getAnalytics(app);
-  });
-}
-
-/** Anonymous-first: never blocks the learner with a signup wall. */
-export async function ensureSignedIn() {
-  if (USE_MOCKS) return { uid: "mock-user" };
-  const cred = await signInAnonymously(auth);
-  return cred.user;
+  isSupported()
+    .then((ok) => {
+      if (ok) analytics = getAnalytics(app);
+    })
+    .catch(() => {});
+} else if (!MOCK_STORE && !configured) {
+  console.warn("[firebase] VITE_MOCK_STORE is off but config is missing — staying on local storage.");
 }
 
 /**
- * Single analytics entry point. Call this, not logEvent, so mock mode stays silent.
- * Events we care about: onboarding_complete, lesson_start, quiz_submit,
- * tutor_message, misconception_detected, anchor_used, lesson_complete.
+ * Anonymous-first: a learner never hits a signup wall. Resolves with the user
+ * (real or a stand-in when mocked) and never rejects — auth failing must not
+ * take the app down.
+ */
+export async function ensureSignedIn() {
+  if (!live) return { uid: "local-user" };
+  if (auth.currentUser) return auth.currentUser;
+  try {
+    const cred = await signInAnonymously(auth);
+    return cred.user;
+  } catch (err) {
+    console.warn("[firebase] anonymous sign-in failed, continuing locally", err);
+    return { uid: "local-user" };
+  }
+}
+
+export function onUser(cb) {
+  if (!live) return () => {};
+  return onAuthStateChanged(auth, cb);
+}
+
+/**
+ * Single analytics entry point — call this, never logEvent directly, so mock
+ * mode stays silent and the event list stays greppable.
+ *
+ * Events: onboarding_complete · lesson_start · quiz_submit · tutor_message
+ *         misconception_detected · anchor_used · lesson_complete
  */
 export function track(event, params = {}) {
-  if (USE_MOCKS) {
+  if (!live || !analytics) {
     console.debug("[track]", event, params);
     return;
   }
-  if (analytics) logEvent(analytics, event, params);
+  try {
+    logEvent(analytics, event, params);
+  } catch (err) {
+    console.debug("[track] failed", event, err);
+  }
 }

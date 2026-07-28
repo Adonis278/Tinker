@@ -7,7 +7,9 @@
  * Request/response shapes are frozen in docs/ARCHITECTURE.md §4.
  */
 
-const USE_MOCKS = import.meta.env.VITE_USE_MOCKS !== "false";
+import { MOCK_TUTOR } from "./env.js";
+
+const USE_MOCKS = MOCK_TUTOR;
 const ENDPOINT = import.meta.env.VITE_TUTOR_ENDPOINT;
 
 /**
