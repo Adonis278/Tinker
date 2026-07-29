@@ -1,51 +1,86 @@
 /**
- * OWNER: P3 (Game Logic).
- * Pure functions only — no React, no Firebase. That keeps it trivially testable
- * and means P1 can call it from anywhere without side effects.
+ * OWNER: P3 (Content + Game Logic).
+ *
+ * Pure functions only, no localStorage, no Firestore, no side effects.
+ * src/lib/store.js (P4) calls these and persists whatever they return.
+ * Field shapes are frozen in docs/ARCHITECTURE.md section 3. Do not rename.
  */
 
-export const XP_PER_LESSON = 50;
-export const XP_PER_CORRECT = 10;
-export const XP_STREAK_BONUS = 25;
+const XP_BASE_PER_LESSON = 50;
+const XP_MAX_QUIZ_BONUS = 50;
 
-export const BADGES = [
-  { id: "first-steps", label: "First Steps", emoji: "\u{1F331}", test: (u) => u.xp > 0 },
-  { id: "own-words", label: "In My Own Words", emoji: "\u{1F5E3}️", test: (u) => (u.tutorTurns ?? 0) >= 3 },
-  { id: "streak-3", label: "Three Day Fire", emoji: "\u{1F525}", test: (u) => (u.streak ?? 0) >= 3 },
-];
-
-/** Level curve: 0-99 = L1, then every 150 XP. */
-export function levelFor(xp = 0) {
-  if (xp < 100) return 1;
-  return 2 + Math.floor((xp - 100) / 150);
+export function xpForLessonCompletion(quizScore) {
+  const clamped = Math.max(0, Math.min(1, quizScore));
+  return XP_BASE_PER_LESSON + Math.round(clamped * XP_MAX_QUIZ_BONUS);
 }
 
-export function xpToNextLevel(xp = 0) {
-  const level = levelFor(xp);
-  const next = level === 1 ? 100 : 100 + (level - 1) * 150;
-  return { current: xp, next, pct: Math.min(100, Math.round((xp / next) * 100)) };
+function xpRequiredForLevel(level) {
+  return 50 * (level - 1) * (level - 1);
 }
 
-export function awardQuiz({ correctCount, total }) {
-  const perfect = correctCount === total;
-  return XP_PER_CORRECT * correctCount + (perfect ? XP_PER_LESSON : 0);
+export function getLevelInfo(totalXp) {
+  let level = 1;
+  while (xpRequiredForLevel(level + 1) <= totalXp) level++;
+  const currentFloor = xpRequiredForLevel(level);
+  const nextCeiling = xpRequiredForLevel(level + 1);
+  return {
+    level,
+    xpIntoLevel: totalXp - currentFloor,
+    xpForNextLevel: nextCeiling - currentFloor,
+  };
 }
 
-/** Returns the updated streak given the last active date. Pure — pass today in for tests. */
-export function nextStreak(lastActiveDate, streak = 0, today = new Date().toISOString().slice(0, 10)) {
-  if (lastActiveDate === today) return streak;
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  return lastActiveDate === yesterday ? streak + 1 : 1;
+function dayDiff(fromDateStr, toDateStr) {
+  const from = new Date(fromDateStr + "T00:00:00Z");
+  const to = new Date(toDateStr + "T00:00:00Z");
+  return Math.round((to - from) / 86400000);
 }
 
-export function earnedBadges(user) {
-  return BADGES.filter((b) => b.test(user)).map((b) => b.id);
+export function calculateStreak(lastActiveDate, previousStreak, today) {
+  if (!lastActiveDate) return 1;
+  const diffDays = dayDiff(lastActiveDate, today);
+  if (diffDays <= 0) return previousStreak || 1;
+  if (diffDays === 1) return (previousStreak || 0) + 1;
+  return 1;
+}
+
+export const BADGE_DEFS = {
+  "first-lesson": { label: "First Step", check: (ctx) => ctx.completedLessonCount >= 1 },
+  "three-day-streak": { label: "Warming Up", check: (ctx) => ctx.streak >= 3 },
+  "seven-day-streak": { label: "One Week Strong", check: (ctx) => ctx.streak >= 7 },
+  "perfect-score": { label: "Nailed It", check: (ctx) => ctx.justScoredPerfect === true },
+  "all-lessons-complete": { label: "Course Cleared", check: (ctx) => ctx.completedLessonCount >= ctx.totalLessonCount },
+};
+
+export function evaluateNewBadges(existingBadges, ctx) {
+  return Object.entries(BADGE_DEFS)
+    .filter(([id, def]) => !existingBadges.includes(id) && def.check(ctx))
+    .map(([id]) => id);
 }
 
 /**
- * Reinforcement: a wrong answer schedules a micro-review.
- * TODO(P3): if there's time, weight the delay by how many times they've missed it.
+ * Single entry point for store.js to call on lesson completion.
+ * Pure, computes everything that changes; store.js persists the result.
+ * Must be called exactly once per completion (the not-started/in-progress
+ * to complete transition), not on every lesson reopen.
  */
-export function scheduleReview({ hoursFromNow = 48 } = {}) {
-  return Date.now() + hoursFromNow * 3600 * 1000;
+export function applyLessonCompletion({ user, quizScore, today, completedLessonCount, totalLessonCount }) {
+  const xpGained = xpForLessonCompletion(quizScore);
+  const newXp = (user.xp ?? 0) + xpGained;
+  const newStreak = calculateStreak(user.lastActiveDate, user.streak ?? 0, today);
+  const newBadges = evaluateNewBadges(user.badges ?? [], {
+    completedLessonCount,
+    totalLessonCount,
+    streak: newStreak,
+    justScoredPerfect: quizScore >= 1,
+  });
+
+  return {
+    xp: newXp,
+    streak: newStreak,
+    lastActiveDate: today,
+    badges: [...(user.badges ?? []), ...newBadges],
+    xpGained,
+    newBadges,
+  };
 }
