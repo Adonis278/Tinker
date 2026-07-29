@@ -3,65 +3,176 @@
     "id": "algebra-01",
     "order": 1,
     "title": "What a Variable Really Is",
+    "hookMd": "A striker finishes the season with 24 goals. Everyone remembers the 15 league goals. Almost nobody can tell you the cup total, yet it's sitting right there, solvable, the moment you know one trick.",
     "conceptId": "variable-as-unknown",
     "conceptSummary": "A variable is a placeholder for a quantity we do not know yet. Solving for it means using the relationships we DO know to pin down its value. The equals sign is a promise that both sides are worth the same.",
     "bodyMd": "A letter like **x** is not scary maths. It is just a box with something hidden inside.\n\nThe equation tells you the *rules* the hidden thing obeys. Your job is to use those rules to open the box.",
     "anchorPrompts": {
       "cooking": "You know a pot of stew needs a certain amount of salt, but the recipe card is smudged. Everything else you know: it feeds 6, and it took 3 spoons of oil. The smudged number is your x.",
-      "football": "A striker finished the season on 24 goals across all competitions. You know he got 15 in the league. The cup tally is the number you're missing — that's your x.",
-      "music": "A bar has 4 beats. You can hear 3 of them clearly and one is buried in the mix. The buried beat is x — and the bar's total tells you exactly what it must be.",
+      "football": "A striker finished the season on 24 goals across all competitions. You know he got 15 in the league. The cup tally is the number you're missing, that's your x.",
+      "music": "A bar has 4 beats. You can hear 3 of them clearly and one is buried in the mix. The buried beat is x, and the bar's total tells you exactly what it must be.",
       "farming": "You harvested 40 bags from three fields. Two fields gave 15 and 12. The third field's yield is your x."
     },
     "quiz": [
       {
         "id": "q1",
         "prompt": "In the equation x + 15 = 24, what does x represent?",
-        "options": [
-          "A number we already know",
-          "A quantity we are trying to find",
-          "The answer to the whole equation",
-          "A mistake in the maths"
-        ],
+        "options": ["A number we already know", "A quantity we are trying to find", "The answer to the whole equation", "A mistake in the maths"],
         "answerIdx": 1,
-        "misconceptionMap": {
-          "0": "var-is-known",
-          "2": "var-is-the-answer",
-          "3": "var-is-error"
-        }
+        "misconceptionMap": { "0": "var-is-known", "2": "var-is-the-answer", "3": "var-is-error" }
       },
       {
         "id": "q2",
         "prompt": "To solve x + 15 = 24, what should you do?",
-        "options": [
-          "Add 15 to both sides",
-          "Subtract 15 from the left side only",
-          "Subtract 15 from both sides",
-          "Multiply both sides by 15"
-        ],
+        "options": ["Add 15 to both sides", "Subtract 15 from the left side only", "Subtract 15 from both sides", "Multiply both sides by 15"],
         "answerIdx": 2,
-        "misconceptionMap": {
-          "0": "wrong-inverse-operation",
-          "1": "one-sided-operation",
-          "3": "wrong-inverse-operation"
-        }
+        "misconceptionMap": { "0": "wrong-inverse-operation", "1": "one-sided-operation", "3": "wrong-inverse-operation" }
       }
     ],
     "misconceptions": [
+      { "id": "one-sided-operation", "description": "Learner changes only one side of the equation, breaking the balance.", "signal": "Applies an operation to the left side but leaves the right side untouched." },
+      { "id": "wrong-inverse-operation", "description": "Learner uses the same operation instead of the inverse one.", "signal": "Adds when they should subtract, or multiplies when they should divide." },
+      { "id": "var-is-the-answer", "description": "Learner thinks the letter x IS the final answer rather than a placeholder for it.", "signal": "Says x is the answer instead of the unknown quantity." }
+    ]
+  },
+  {
+    "id": "algebra-02",
+    "order": 2,
+    "title": "Keeping Both Sides Balanced",
+    "hookMd": "Two football clubs are tied on points at the top of the table. The league fines one club 3 points for a breach. If the table still shows them level the next morning, something happened to the other club too, even though nobody announced it.",
+    "conceptId": "balance-both-sides",
+    "conceptSummary": "The equals sign is a promise that both sides hold the same value at all times. Whatever operation you perform, you must perform the identical operation on both sides, or the promise is broken and the equation stops being true.",
+    "bodyMd": "Think of the equals sign as a seesaw that must stay level.\n\nIf you add weight to one side, the seesaw tips, unless you add the exact same weight to the other side too. Solving an equation means moving things around *without ever tipping the seesaw*.",
+    "anchorPrompts": {
+      "cooking": "You're splitting a bill for ingredients evenly between two pots of soup. If you add an extra onion to one pot's cost, you have to add its price to the other pot's total too, or the two pots stop costing the same.",
+      "football": "Two teams are level on points. If the league deducts 3 points from one team for a breach, it has to deduct the same 3 from the other for the table to still show them level, otherwise 'level' stops being true.",
+      "music": "Two speakers are set to matching volume. Turn one up by 5, and it's no longer matching, unless you turn the other one up by exactly 5 too.",
+      "farming": "Two fields were fertilised with the same amount of feed. Add an extra bag to one field's total, and the fields are no longer matched unless the other gets an extra bag as well."
+    },
+    "quiz": [
       {
-        "id": "one-sided-operation",
-        "description": "Learner changes only one side of the equation, breaking the balance.",
-        "signal": "Applies an operation to the left side but leaves the right side untouched."
+        "id": "q1",
+        "prompt": "In x - 4 = 10, you add 4 to the left side. What must you do to the right side?",
+        "options": ["Nothing, only the side with x changes", "Add 4 to the right side too", "Subtract 4 from the right side", "Multiply the right side by 4"],
+        "answerIdx": 1,
+        "misconceptionMap": { "0": "unequal-operation-applied", "2": "unequal-operation-applied", "3": "wrong-inverse-operation" }
       },
       {
-        "id": "wrong-inverse-operation",
-        "description": "Learner uses the same operation instead of the inverse one.",
-        "signal": "Adds when they should subtract, or multiplies when they should divide."
-      },
-      {
-        "id": "var-is-the-answer",
-        "description": "Learner thinks the letter x IS the final answer rather than a placeholder for it.",
-        "signal": "Says x is the answer instead of the unknown quantity."
+        "id": "q2",
+        "prompt": "Why must both sides of an equation always get the same operation?",
+        "options": ["Because it's a maths rule with no real reason", "Because the two sides must stay equal in value", "Because otherwise x disappears", "It's only needed for division, not addition"],
+        "answerIdx": 1,
+        "misconceptionMap": { "0": "ignores-existing-balance", "2": "ignores-existing-balance", "3": "unequal-operation-applied" }
       }
+    ],
+    "misconceptions": [
+      { "id": "unequal-operation-applied", "description": "Learner applies an operation to one side, or a different operation to each side, breaking equality.", "signal": "Adds or changes only the side containing x, or uses a different number/operation on each side." },
+      { "id": "ignores-existing-balance", "description": "Learner doesn't treat the equals sign as a standing promise of equal value, and can't explain why both sides must move together.", "signal": "Describes the rule as arbitrary rather than as preserving equality." }
+    ]
+  },
+  {
+    "id": "algebra-03",
+    "order": 3,
+    "title": "Undoing Operations (Inverses)",
+    "hookMd": "A chef tastes a sauce and says 'too salty, I added a spoon too many.' She doesn't add more salt to fix it. She does the opposite of what broke it. That one sentence is the entire idea behind solving half of algebra.",
+    "conceptId": "inverse-operations",
+    "conceptSummary": "Every operation has an opposite that cancels it out: addition undoes subtraction, multiplication undoes division. To isolate a variable, you apply the inverse of whatever operation is being done to it, not the same operation again.",
+    "bodyMd": "If a number was **added**, you **subtract** it away. If a number was **multiplied**, you **divide** it away.\n\nThe inverse always undoes, it never repeats. Doing the same operation again just moves you further from the answer, not closer.",
+    "anchorPrompts": {
+      "cooking": "You added 2 cups of water too many to a pot. To fix it, you don't add more water, you remove exactly 2 cups. Removing is the inverse of adding.",
+      "football": "A player's fitness score got doubled after a bonus review. To find his original score, you don't double it again, you halve it. Halving is the inverse of doubling.",
+      "music": "A track got its volume boosted by 6dB in the mix. To hear the original level, you cut 6dB back out. Cutting is the inverse of boosting.",
+      "farming": "A field's yield was tripled after switching fertiliser. To find the old yield, you divide the new number by 3, not multiply it further."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "If x is multiplied by 5 to give 30, how do you find x?",
+        "options": ["Multiply 30 by 5", "Divide 30 by 5", "Subtract 5 from 30", "Add 5 to 30"],
+        "answerIdx": 1,
+        "misconceptionMap": { "0": "applies-original-operation-again", "2": "confuses-multiply-divide-inverse", "3": "confuses-multiply-divide-inverse" }
+      },
+      {
+        "id": "q2",
+        "prompt": "What is the inverse of subtracting 7?",
+        "options": ["Subtracting 7 again", "Multiplying by 7", "Adding 7", "Dividing by 7"],
+        "answerIdx": 2,
+        "misconceptionMap": { "0": "applies-original-operation-again", "1": "confuses-multiply-divide-inverse", "3": "confuses-multiply-divide-inverse" }
+      }
+    ],
+    "misconceptions": [
+      { "id": "applies-original-operation-again", "description": "Learner repeats the same operation shown in the equation instead of applying its inverse.", "signal": "Multiplies again after a multiplication, or subtracts again after a subtraction, moving further from the answer." },
+      { "id": "confuses-multiply-divide-inverse", "description": "Learner mixes up which operation undoes which, e.g. thinks subtraction undoes multiplication.", "signal": "Pairs addition/subtraction with a multiplication step, or multiplication/division with an addition step." }
+    ]
+  },
+  {
+    "id": "algebra-04",
+    "order": 4,
+    "title": "Solving in Two Steps",
+    "hookMd": "A DJ's final track reads 11dB. You know it was doubled, then boosted by 3 more. Guess the original level in your head right now, most people get it wrong on the first try, and the reason why is the whole lesson.",
+    "conceptId": "two-step-solving",
+    "conceptSummary": "Some equations need two inverse operations applied in order: first undo addition or subtraction, then undo multiplication or division. Doing them in the wrong order still works eventually, but doing only one step and stopping leaves x unsolved.",
+    "bodyMd": "In 2x + 3 = 11, there are two things happening to x: it's being multiplied by 2, and then 3 is added.\n\nUndo them in reverse order: first remove the +3, then undo the multiplication. Stopping after just one step means you haven't actually found x yet, only simplified the problem.",
+    "anchorPrompts": {
+      "cooking": "A recipe says: double the flour, then add 3 extra spoons for the topping, and you get 11 spoons total. To find the original flour amount, first remove the 3 topping spoons, then undo the doubling.",
+      "football": "A striker's bonus is worked out as double his base goals, plus 3 for a cup run, totalling 11. To find his base goals, first strip out the 3 cup goals, then halve what's left.",
+      "music": "A track's final loudness is double the raw level, plus a 3dB mastering boost, reaching 11dB. To find the raw level, first remove the 3dB boost, then undo the doubling.",
+      "farming": "A field's total feed is double last season's amount plus 3 extra bags for a new crop, reaching 11 bags. First remove the 3 extra bags, then undo the doubling to find last season's amount."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "To solve 2x + 3 = 11, what is the correct first step?",
+        "options": ["Divide everything by 2 first", "Subtract 3 from both sides first", "Add 3 to both sides first", "Multiply both sides by 2 first"],
+        "answerIdx": 1,
+        "misconceptionMap": { "0": "wrong-step-order", "2": "wrong-inverse-operation", "3": "wrong-step-order" }
+      },
+      {
+        "id": "q2",
+        "prompt": "After subtracting 3 from both sides of 2x + 3 = 11, you get 2x = 8. Is x now solved?",
+        "options": ["Yes, x = 8", "No, you still need to divide both sides by 2", "No, you need to add 3 back", "Yes, because 2x is close enough to x"],
+        "answerIdx": 1,
+        "misconceptionMap": { "0": "stops-after-one-step", "2": "stops-after-one-step", "3": "stops-after-one-step" }
+      }
+    ],
+    "misconceptions": [
+      { "id": "wrong-step-order", "description": "Learner tries to undo the multiplication/division before removing the added or subtracted constant.", "signal": "Attempts to divide or multiply both sides while a standalone number is still present on the x side." },
+      { "id": "stops-after-one-step", "description": "Learner treats the equation as solved once the constant is removed, without isolating x fully.", "signal": "States the answer as '2x = 8' or similar, treating a coefficient-attached value as the final answer." }
+    ]
+  },
+  {
+    "id": "algebra-05",
+    "order": 5,
+    "title": "Turning a Word Problem Into an Equation",
+    "hookMd": "A coach says: 'after 4 more goals in the cup, he reached 10 for the season.' Two people read that sentence and write two completely different equations. Only one of them is right, and it's not about maths, it's about reading.",
+    "conceptId": "word-problem-to-equation",
+    "conceptSummary": "Word problems describe a relationship in sentences; solving them starts with correctly identifying which quantity is unknown, and correctly translating the words describing that relationship into symbols in the right order.",
+    "bodyMd": "The hardest part of a word problem usually isn't the maths, it's picking the right thing to call x, and writing down the relationship exactly as the words describe it.\n\nRead for what is unknown first. Then read for how the known numbers relate to it, in the order the sentence gives them.",
+    "anchorPrompts": {
+      "cooking": "A recipe says: 'after adding 4 extra spoons of sugar, the total is 10 spoons.' The unknown is how much sugar you started with, so x + 4 = 10, not 4 + 10 = x.",
+      "football": "A report says: 'after 4 more goals in the cup, his season total reached 10.' The unknown is his goals before the cup run, so x + 4 = 10, not the other way round.",
+      "music": "A note says: 'after boosting the track by 4dB, it measured 10dB.' The unknown is the original level, so x + 4 = 10, the boost comes after the unknown, exactly as written.",
+      "farming": "A record says: 'after harvesting 4 more bags this week, the season total reached 10.' The unknown is bags before this week, so x + 4 = 10."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "'After 4 more goals, his total reached 10.' Which equation matches this?",
+        "options": ["10 + 4 = x", "x + 4 = 10", "4 - x = 10", "x = 4"],
+        "answerIdx": 1,
+        "misconceptionMap": { "0": "translates-relationship-backwards", "2": "translates-relationship-backwards", "3": "misidentifies-unknown" }
+      },
+      {
+        "id": "q2",
+        "prompt": "In the sentence above, what does x represent?",
+        "options": ["The final total, 10", "The 4 extra goals", "His goals before the extra 4", "The difference between 10 and 4"],
+        "answerIdx": 2,
+        "misconceptionMap": { "0": "misidentifies-unknown", "1": "misidentifies-unknown", "3": "misidentifies-unknown" }
+      }
+    ],
+    "misconceptions": [
+      { "id": "misidentifies-unknown", "description": "Learner labels the wrong quantity in the story as x, often the final total or the known change, instead of the true unknown.", "signal": "Sets x equal to a number already given in the problem, rather than the quantity being asked for." },
+      { "id": "translates-relationship-backwards", "description": "Learner reverses the order of the relationship described, e.g. writing 'x subtracted from 4' instead of '4 added to x'.", "signal": "Equation has operands in reversed order from how the sentence describes them." }
     ]
   }
 ]
