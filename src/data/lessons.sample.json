@@ -63,5 +63,285 @@
         "signal": "Says x is the answer instead of the unknown quantity."
       }
     ]
+  },
+  {
+    "id": "algebra-02",
+    "order": 2,
+    "title": "Keeping Both Sides Balanced",
+    "conceptId": "balance-both-sides",
+    "conceptSummary": "An equation is a statement that two expressions have equal value, like a balance scale that is level. Any operation performed on one side must be performed identically on the other side, or the scale tips and the statement stops being true. This is the single rule that justifies every algebraic manipulation that follows.",
+    "bodyMd": "Think of an equation like **x + 4 = 10** as a balance scale that's perfectly level. The left side and right side weigh the same.\n\nIf you take 4 grams off the left pan, the scale tips — unless you also take 4 grams off the right pan. Subtract 4 from both sides and you get **x = 6**, still balanced.",
+    "anchorPrompts": {
+      "cooking": "A recipe says the sweetness on the left of your mixing bowl has to match the sweetness on the right if you're splitting a batch evenly. If you add a spoon of sugar to the left bowl, you must add the same spoon to the right bowl, or one half will taste sweeter and the batches won't match anymore.",
+      "football": "Imagine two teams' scores are tied, 3-3. If the ref gives Team A a bonus point for something, the game is only still 'tied' if Team B also gets a bonus point. An equation is a tie score — whatever adjustment happens to one side has to happen to the other, or the tie breaks.",
+      "music": "Two singers are holding the same note in harmony — matched pitch. If one singer slides up half a tone, the harmony breaks unless the other singer slides up the exact same half tone too. The equation `=` is that matched pitch, and every operation is a slide that both sides must make together.",
+      "farming": "Two fields are planted with the same number of seedling rows. If you add one more row to the first field, you plant one more row in the second field too, so the fields still match."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "You have x + 7 = 15. What's the correct next step to find x?",
+        "options": [
+          "Subtract 7 from both sides",
+          "Subtract 7 from only the left side",
+          "Add 7 to the right side only"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "unbalanced-operation",
+          "2": "unbalanced-operation"
+        }
+      },
+      {
+        "id": "q2",
+        "prompt": "In 2x = 12, a learner divides only the left side by 2 and writes x = 12. What went wrong?",
+        "options": [
+          "They forgot the equation must stay balanced — the right side also needed dividing by 2",
+          "They should have added 2 to both sides instead",
+          "Nothing — x = 12 is correct"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "wrong-inverse-choice",
+          "2": "unbalanced-operation"
+        }
+      },
+      {
+        "id": "q3",
+        "prompt": "x - 5 = 3 is rewritten as x = 3 - 5. Is this balanced correctly?",
+        "options": [
+          "No — moving a term across the equals sign requires flipping its sign, so it should be x = 3 + 5",
+          "Yes, this is correct",
+          "No — you should divide both sides by 5 instead"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "sign-flip-omission",
+          "2": "wrong-inverse-choice"
+        }
+      }
+    ],
+    "misconceptions": [
+      {
+        "id": "unbalanced-operation",
+        "description": "Applies an operation to only one side of the equation instead of both.",
+        "signal": "Learner performs an arithmetic step visibly on one side of the equation only, leaving the other side's expression untouched in their working."
+      },
+      {
+        "id": "sign-flip-omission",
+        "description": "Moves a term across the equals sign without flipping its sign.",
+        "signal": "Learner rewrites a term on the other side of the equals sign with the same sign it had before moving, e.g. writes x = 3 - 5 when it should become x = 3 + 5."
+      }
+    ]
+  },
+  {
+    "id": "algebra-03",
+    "order": 3,
+    "title": "Undoing Operations (Inverses)",
+    "conceptId": "inverse-operations",
+    "conceptSummary": "Every arithmetic operation has an inverse that exactly undoes it: addition undoes subtraction, subtraction undoes addition, multiplication undoes division, and division undoes multiplication. To isolate a variable, identify the operation currently attached to it, then apply that operation's inverse to both sides. Choosing the wrong inverse, or the inverse of the wrong operation, is the most common error at this stage.",
+    "bodyMd": "If **x + 9 = 20**, the variable has 9 *added* to it. The inverse of addition is subtraction, so subtract 9 from both sides: **x = 11**.\n\nIf instead **x / 4 = 5**, the variable has been *divided* by 4, so the inverse is multiplication: multiply both sides by 4 to get **x = 20**.",
+    "anchorPrompts": {
+      "cooking": "If a recipe step says 'add 2 cups of water,' the way to undo that step is to remove 2 cups of water — not to add more flour instead. Undoing means reversing the same action, not doing a different action that feels related.",
+      "football": "If a team's score was doubled by a bonus rule, the only way to get back to the original score is to halve it — not to subtract a random number of points. The inverse of doubling is halving.",
+      "music": "If a track's tempo was sped up by a certain factor, you undo that by slowing it down by the exact same factor, not by changing the key or the volume.",
+      "farming": "If a farmer added 3 extra rows of maize to a field, undoing that means removing exactly 3 rows, not planting a different crop somewhere else."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "In x - 6 = 14, what operation undoes the '-6' attached to x?",
+        "options": [
+          "Add 6 to both sides",
+          "Subtract 6 again from both sides",
+          "Multiply both sides by 6"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "double-inverse-confusion",
+          "2": "wrong-inverse-choice"
+        }
+      },
+      {
+        "id": "q2",
+        "prompt": "In 5x = 30, what's the correct inverse operation to isolate x?",
+        "options": [
+          "Divide both sides by 5",
+          "Subtract 5 from both sides",
+          "Multiply both sides by 5"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "wrong-inverse-choice",
+          "2": "double-inverse-confusion"
+        }
+      },
+      {
+        "id": "q3",
+        "prompt": "A learner solves x / 3 = 9 by writing x = 9 - 3 = 6. What misconception is this?",
+        "options": [
+          "They subtracted instead of multiplying to undo the division",
+          "They forgot to balance both sides equally",
+          "They multiplied when they should have divided"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "unbalanced-operation",
+          "2": "wrong-inverse-choice"
+        }
+      }
+    ],
+    "misconceptions": [
+      {
+        "id": "wrong-inverse-choice",
+        "description": "Picks the inverse of a different operation than the one actually attached to the variable.",
+        "signal": "The operation the learner applies does not match the true inverse of the operation shown in the equation (e.g. equation shows division, learner subtracts)."
+      },
+      {
+        "id": "double-inverse-confusion",
+        "description": "Applies the same operation again instead of its inverse, as if repeating the action would cancel it out.",
+        "signal": "Learner repeats the identical operation already present in the equation rather than applying the opposite operation."
+      }
+    ]
+  },
+  {
+    "id": "algebra-04",
+    "order": 4,
+    "title": "Solving in Two Steps",
+    "conceptId": "two-step-equations",
+    "conceptSummary": "Some equations have two operations attached to the variable, like 2x + 3 = 11. These must be undone in reverse order: undo addition/subtraction first, then undo multiplication/division. Undoing them in the wrong order, or skipping one of the two steps, leaves the variable un-isolated or produces a wrong value.",
+    "bodyMd": "For **2x + 3 = 11**, x has two things attached: it's multiplied by 2, then 3 is added.\n\nUndo in reverse: first subtract 3 from both sides (**2x = 8**), then divide both sides by 2 (**x = 4**). Divide first and you'd be dividing the 3 too, which isn't valid.",
+    "anchorPrompts": {
+      "cooking": "You put on an apron, then a chef's hat, before cooking. To get back to your street clothes, you take off the hat first, then the apron — reverse order.",
+      "football": "A player's total distance run is doubled by a fitness multiplier, then 3 extra warm-up laps are added on top. To find their original run, subtract the 3 warm-up laps first, then undo the doubling — in that order.",
+      "music": "A track is pitched up by a fixed multiplier, then a fixed number of beats of silence are added at the start. To restore the original, trim the silence first, then undo the pitch shift.",
+      "farming": "A farmer doubles the rows in a field, then adds 3 extra border rows around the edge. To find the original row count, remove the 3 border rows first, then halve what's left."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "To solve 3x + 5 = 20, what should you do first?",
+        "options": [
+          "Subtract 5 from both sides",
+          "Divide both sides by 3",
+          "Add 5 to both sides"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "wrong-order-of-inverse-operations",
+          "2": "wrong-inverse-choice"
+        }
+      },
+      {
+        "id": "q2",
+        "prompt": "A learner solving 4x - 2 = 10 divides both sides by 4 first, getting x - 0.5 = 2.5. What's the issue?",
+        "options": [
+          "They undid the operations in the wrong order — subtraction should be undone before division",
+          "This is a valid alternate method",
+          "They should have added 2 first"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "wrong-order-of-inverse-operations",
+          "2": "skips-a-step"
+        }
+      },
+      {
+        "id": "q3",
+        "prompt": "For 2x + 3 = 11, a learner subtracts 3 to get 2x = 8, then stops and writes x = 8. What happened?",
+        "options": [
+          "They skipped the second step — dividing both sides by 2",
+          "This is fully correct",
+          "They should have divided by 3 instead"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "skips-a-step",
+          "2": "wrong-inverse-choice"
+        }
+      }
+    ],
+    "misconceptions": [
+      {
+        "id": "wrong-order-of-inverse-operations",
+        "description": "Undoes the multiplication/division step before the addition/subtraction step, instead of reverse order.",
+        "signal": "Learner's first move on a two-step equation is to divide or multiply both sides, when an addition or subtraction term should have been removed first."
+      },
+      {
+        "id": "skips-a-step",
+        "description": "Performs only one of the two required inverse operations and stops, leaving the variable not fully isolated.",
+        "signal": "Learner's final answer still has a coefficient attached to the variable (e.g. 2x = 8 presented as the final answer instead of x = 4)."
+      }
+    ]
+  },
+  {
+    "id": "algebra-05",
+    "order": 5,
+    "title": "Turning a Word Problem into an Equation",
+    "conceptId": "word-problem-translation",
+    "conceptSummary": "A word problem describes a real situation with a hidden, unknown quantity. Solving it means first assigning a variable to represent the unknown, then translating the described relationship (more than, less than, times, split evenly) into symbols, and only then solving. Skipping the translation step and guessing a number, or mistranslating a phrase into the wrong operation, are the two most common failure points.",
+    "bodyMd": "Take: 'Amina has some stickers. After buying 5 more, she has 17.' The unknown is her starting number of stickers — call it **x**.\n\n'After buying 5 more' means add 5. 'She has 17' means the result equals 17. That translates to **x + 5 = 17**. Only after writing the equation do you solve it (subtract 5: **x = 12**).",
+    "anchorPrompts": {
+      "cooking": "'A pot had some water in it. After pouring in 2 more litres, it has 6 litres.' The unknown is the starting amount, call it x: x + 2 = 6. You name the unknown, translate the action, then solve.",
+      "football": "'A team had some points. After a 3-point bonus play, they have 14.' Call the starting points x: x + 3 = 14. Turning 'after a bonus of 3' into +3 is the real skill.",
+      "music": "'A playlist had some songs. After adding 4 more tracks, it has 19.' Call the starting count x: x + 4 = 19. You write the relationship as an equation first, then solve it.",
+      "farming": "'A field had some rows planted. After planting 6 more rows, it has 20.' Call the original rows x: x + 6 = 20. Naming the unknown precisely is what turns a story into math."
+    },
+    "quiz": [
+      {
+        "id": "q1",
+        "prompt": "'Kwame had some money. After earning $8, he has $23.' Which equation matches this?",
+        "options": [
+          "x + 8 = 23",
+          "x - 8 = 23",
+          "23 = 8"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "mistranslates-relationship",
+          "2": "ignores-the-unknown"
+        }
+      },
+      {
+        "id": "q2",
+        "prompt": "'A tank had some litres. After 5 litres were removed, it has 12 litres left.' Which equation is correct?",
+        "options": [
+          "x - 5 = 12",
+          "x + 5 = 12",
+          "5 - x = 12"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "mistranslates-relationship",
+          "2": "mistranslates-relationship"
+        }
+      },
+      {
+        "id": "q3",
+        "prompt": "A learner reads 'a number increased by 6 gives 20' and writes just '14' as the answer without setting up an equation. What's the concern?",
+        "options": [
+          "They skipped naming the unknown and writing the equation, even though the final number happens to be right",
+          "This is the correct and only method needed",
+          "They should have used a different variable name"
+        ],
+        "answerIdx": 0,
+        "misconceptionMap": {
+          "1": "ignores-the-unknown",
+          "2": "ignores-the-unknown"
+        }
+      }
+    ],
+    "misconceptions": [
+      {
+        "id": "mistranslates-relationship",
+        "description": "Converts a word relationship into the wrong operation, e.g. reads 'more than' as subtraction or 'removed' as addition.",
+        "signal": "The operation in the learner's equation is the opposite of, or unrelated to, the relationship phrase used in the problem (e.g. 'earned more' translated as subtraction)."
+      },
+      {
+        "id": "ignores-the-unknown",
+        "description": "Skips assigning a variable to the unknown quantity and jumps straight to guessing or mentally computing a final number.",
+        "signal": "Learner provides a final numeric answer with no equation or variable shown, especially on problems phrased as a story rather than a bare calculation."
+      }
+    ]
   }
 ]
