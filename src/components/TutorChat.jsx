@@ -10,6 +10,13 @@ import { track } from "../firebase.js";
  * Keyboard behaviour: the sheet is sized against the *visual* viewport
  * (dvh + visualViewport listener), so opening the mobile keyboard resizes
  * the sheet instead of jumping it. Input row is safe-area padded.
+ *
+ * The overlay wrapper below is `fixed inset-0`, which on iOS Safari
+ * anchors to the *layout* viewport — it does not shrink or shift when the
+ * keyboard opens. That leaves the sheet's `justify-end` anchor pointing at
+ * the bottom of the pre-keyboard screen, behind the keyboard. So the
+ * wrapper's top/height are also synced to visualViewport, not just the
+ * sheet's maxHeight.
  */
 export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   const opener = misconceptionId
@@ -21,6 +28,7 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   const [busy, setBusy] = useState(false);
   const endRef = useRef(null);
   const sheetRef = useRef(null);
+  const overlayRef = useRef(null);
 
   useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), [messages, busy]);
 
@@ -29,12 +37,21 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
     const vv = window.visualViewport;
     if (!vv) return;
     const onResize = () => {
+      if (overlayRef.current) {
+        overlayRef.current.style.top = `${vv.offsetTop}px`;
+        overlayRef.current.style.height = `${vv.height}px`;
+      }
       if (sheetRef.current) {
         sheetRef.current.style.maxHeight = `${Math.round(vv.height * 0.85)}px`;
       }
     };
+    onResize();
     vv.addEventListener("resize", onResize);
-    return () => vv.removeEventListener("resize", onResize);
+    vv.addEventListener("scroll", onResize);
+    return () => {
+      vv.removeEventListener("resize", onResize);
+      vv.removeEventListener("scroll", onResize);
+    };
   }, []);
 
   async function send() {
@@ -69,7 +86,11 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/40" onClick={onClose}>
+    <div
+      ref={overlayRef}
+      className="fixed inset-x-0 top-0 z-50 flex h-[100dvh] flex-col justify-end bg-black/40"
+      onClick={onClose}
+    >
       <div
         ref={sheetRef}
         className="flex flex-col rounded-t-3xl bg-white shadow-2xl"
