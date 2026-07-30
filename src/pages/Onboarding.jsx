@@ -46,7 +46,7 @@ export default function Onboarding() {
 
           <label className="mt-6 block text-sm font-medium">What should we call you?</label>
           <input
-            className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-brand-blue focus:outline-none focus-visible:ring focus-visible:ring-brand-blue/20"
+            className="mt-1 min-h-[44px] w-full rounded-lg border px-3 py-2 focus:border-brand-blue focus:outline-none focus-visible:ring focus-visible:ring-brand-blue/20"
             value={form.displayName}
             onChange={(e) => setForm({ ...form, displayName: e.target.value })}
             placeholder="Your name"
