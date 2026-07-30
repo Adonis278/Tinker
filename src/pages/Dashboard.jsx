@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { getUser, getRegion, resetAll } from "../lib/store.js";
 import { levelFor, xpToNextLevel, BADGES, earnedBadges } from "../lib/gamification.js";
 import { INTEREST_DOMAINS } from "../data/interests.js";
@@ -37,12 +38,12 @@ export default function Dashboard() {
         <p className="max-w-[260px] text-sm leading-relaxed text-slate-500">
           Finish your first lesson and this dashboard comes alive.
         </p>
-        <a
-          href="/onboarding"
+        <Link
+          to="/onboarding"
           className="mt-2 flex min-h-[44px] items-center rounded-full bg-brand-blue px-5 text-sm font-bold text-white active:scale-95"
         >
           Start in 60 seconds
-        </a>
+        </Link>
       </div>
     );
 
@@ -88,16 +89,11 @@ export default function Dashboard() {
                 has ? "bg-white shadow-sm ring-brand-blue/20" : "bg-slate-50 ring-slate-100"
               }`}
             >
-              <span
-                aria-hidden="true"
-                className={`relative text-3xl leading-none ${has ? "" : "grayscale opacity-35"}`}
-              >
-                {b.emoji}
-                {!has && (
-                  <span className="absolute -bottom-1 -right-2 text-sm opacity-100" style={{ filter: "none" }}>
-                    🔒
-                  </span>
-                )}
+              {/* The lock sits OUTSIDE the greyed span — opacity on a parent
+                  cascades to the whole subtree and a child cannot escape it. */}
+              <span aria-hidden="true" className="relative text-3xl leading-none">
+                <span className={has ? "" : "block grayscale opacity-35"}>{b.emoji}</span>
+                {!has && <span className="absolute -bottom-1 -right-2 text-sm">🔒</span>}
               </span>
               <span
                 className={`text-[11px] font-semibold leading-tight ${has ? "text-brand-navy" : "text-slate-400"}`}
@@ -155,7 +151,7 @@ export default function Dashboard() {
           resetAll();
           location.href = "/";
         }}
-        className="text-xs text-slate-400 underline"
+        className="min-h-[44px] text-xs text-slate-400 underline"
       >
         Reset demo data
       </button>

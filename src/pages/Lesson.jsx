@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import lessons from "../data/lessons.sample.json";
 import { INTEREST_DOMAINS } from "../data/interests.js";
 import { getUser, saveUser, saveProgress } from "../lib/store.js";
@@ -21,6 +21,10 @@ export default function Lesson() {
   const [submitted, setSubmitted] = useState(false);
   const [tutorOpen, setTutorOpen] = useState(false);
   const [activeMisconception, setActiveMisconception] = useState(null);
+  // Tone-critical: the banner must key off whether they were right, NOT off
+  // whether a misconception id happened to be mapped. A wrong answer with no
+  // mapping must never render the celebratory state.
+  const [allCorrect, setAllCorrect] = useState(false);
 
   // Analytics owned by P4 — the taxonomy lives in src/firebase.js.
   useEffect(() => {
@@ -39,12 +43,12 @@ export default function Lesson() {
         <p className="max-w-[260px] text-sm leading-relaxed text-slate-500">
           Tell us your language and your world — then this lesson is written for you.
         </p>
-        <a
-          href="/onboarding"
+        <Link
+          to="/onboarding"
           className="mt-2 flex min-h-[44px] items-center rounded-full bg-brand-blue px-5 text-sm font-bold text-white active:scale-95"
         >
           Start in 60 seconds
-        </a>
+        </Link>
       </div>
     );
 
@@ -73,6 +77,7 @@ export default function Lesson() {
     track("quiz_submit", { lessonId: lesson.id, score: correct / lesson.quiz.length, misconception: missed });
     track("lesson_complete", { lessonId: lesson.id, score: correct / lesson.quiz.length, xpAwarded: xp });
     setSubmitted(true);
+    setAllCorrect(correct === lesson.quiz.length);
     if (missed) {
       setActiveMisconception(missed);
       setTutorOpen(true);
@@ -147,22 +152,24 @@ export default function Lesson() {
       ))}
 
       {submitted &&
-        (activeMisconception ? (
-          <div className="tinker-pop mt-5 rounded-2xl bg-amber-50 px-4 py-3.5 ring-1 ring-amber-200">
-            <div className="flex items-start gap-3">
-              <span aria-hidden="true" className="text-xl">💡</span>
-              <p className="text-[15px] leading-snug text-amber-900">
-                <span className="font-bold">Not yet — but you're close.</span> Your tutor spotted
-                exactly where the thinking slipped. Talk it through — no marks lost.
-              </p>
-            </div>
-          </div>
-        ) : (
+        (allCorrect ? (
           <div className="tinker-pop mt-5 flex items-start gap-3 rounded-2xl bg-emerald-50 px-4 py-3.5 ring-1 ring-emerald-200">
             <span aria-hidden="true" className="text-xl">🎉</span>
             <p className="text-[15px] leading-snug text-emerald-900">
               <span className="font-bold">You've got it.</span> That's exactly the idea.
             </p>
+          </div>
+        ) : (
+          <div className="tinker-pop mt-5 rounded-2xl bg-amber-50 px-4 py-3.5 ring-1 ring-amber-200">
+            <div className="flex items-start gap-3">
+              <span aria-hidden="true" className="text-xl">💡</span>
+              <p className="text-[15px] leading-snug text-amber-900">
+                <span className="font-bold">Not yet — but you're close.</span>{" "}
+                {activeMisconception
+                  ? "Your tutor spotted exactly where the thinking slipped. Talk it through — no marks lost."
+                  : "Let's walk through it together — no marks lost."}
+              </p>
+            </div>
           </div>
         ))}
 
