@@ -4,6 +4,7 @@ import { levelFor, xpToNextLevel, BADGES, earnedBadges } from "../lib/gamificati
 import { INTEREST_DOMAINS } from "../data/interests.js";
 
 /**
+ * OWNER: P1 (layout) + P3 (the numbers).
  * The region card is the emotional close of the demo — it goes last and
  * carries the most visual weight. XP bar animates on mount. Locked badges
  * stay visible and greyed: loss aversion needs to be seen.
@@ -11,6 +12,7 @@ import { INTEREST_DOMAINS } from "../data/interests.js";
 export default function Dashboard() {
   const user = getUser();
   const region = getRegion();
+
   const { pct, next } = xpToNextLevel(user?.xp ?? 0);
   const earned = user ? earnedBadges(user) : [];
 

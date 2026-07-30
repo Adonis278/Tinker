@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { askTutor } from "../lib/tutor.js";
 import { track } from "../firebase.js";
-/*
+
+/**
  * OWNER: P1 (the skin) — P2 owns what comes back from askTutor().
  * Bottom sheet chat. The "anchor" and "model" chips are demo gold: they make
  * the invisible AI work visible to a judge. Keep them.
@@ -11,6 +13,10 @@ import { track } from "../firebase.js";
  */
 export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   const opener = misconceptionId
+    ? "I noticed something in your answer. Let's look at it together — no marks lost."
+    : "Ask me anything about this lesson. Fair warning: I won't just hand you answers.";
+
+  const [messages, setMessages] = useState([{ role: "assistant", content: opener, meta: null }]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef(null);
@@ -33,6 +39,33 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
 
   async function send() {
     const text = input.trim();
+    if (!text || busy) return;
+    setInput("");
+    const history = messages.map(({ role, content }) => ({ role, content }));
+    setMessages((m) => [...m, { role: "user", content: text }]);
+    setBusy(true);
+    track("tutor_message", { lessonId: lesson.id });
+
+    const res = await askTutor({
+      uid: user.uid ?? "local",
+      lessonId: lesson.id,
+      conceptId: lesson.conceptId,
+      message: text,
+      history,
+      learner: {
+        nativeLanguage: user.nativeLanguage,
+        interests: user.interests,
+        ageBand: user.ageBand,
+      },
+      context: {
+        lessonTitle: lesson.title,
+        conceptSummary: lesson.conceptSummary,
+        misconceptions: lesson.misconceptions,
+      },
+    });
+
+    setMessages((m) => [...m, { role: "assistant", content: res.reply, meta: res }]);
+    setBusy(false);
   }
 
   return (

@@ -5,10 +5,31 @@ import { INTEREST_DOMAINS } from "../data/interests.js";
 import { getUser, saveUser, saveProgress } from "../lib/store.js";
 import { awardQuiz, scheduleReview } from "../lib/gamification.js";
 import { track } from "../firebase.js";
+import TutorChat from "../components/TutorChat.jsx";
 
+/**
+ * OWNER: P1.
+ * Renders a lesson, swaps in the learner's interest anchor, runs the quiz,
+ * and opens the tutor on a wrong answer. Working skeleton — style it up.
+ */
 export default function Lesson() {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => {}, [lesson.id]);
+  const { lessonId } = useParams();
+  const user = getUser();
+  const lesson = lessons.find((l) => l.id === lessonId) ?? lessons[0];
+
+  const [answers, setAnswers] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [tutorOpen, setTutorOpen] = useState(false);
+  const [activeMisconception, setActiveMisconception] = useState(null);
+
+  // Analytics owned by P4 — the taxonomy lives in src/firebase.js.
+  useEffect(() => {
+    if (!user) return;
+    const anchor = user.interests?.find((i) => lesson.anchorPrompts[i]) ?? "cooking";
+    track("lesson_start", { lessonId: lesson.id });
+    track("anchor_used", { lessonId: lesson.id, anchor });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson.id]);
 
   if (!user)
     return (
@@ -36,11 +57,37 @@ export default function Lesson() {
 
   function submit() {
     const correct = lesson.quiz.filter((q) => answers[q.id] === q.answerIdx).length;
+    const wrong = lesson.quiz.find((q) => answers[q.id] !== undefined && answers[q.id] !== q.answerIdx);
+    const missed = wrong ? wrong.misconceptionMap[String(answers[wrong.id])] : null;
+
+    const xp = awardQuiz({ correctCount: correct, total: lesson.quiz.length });
+    saveUser({ xp: (user.xp ?? 0) + xp });
+    saveProgress(lesson.id, {
+      status: "complete",
+      quizScore: correct / lesson.quiz.length,
+      misconceptionsHit: missed ? [missed] : [],
+      reviewDueAt: missed ? scheduleReview() : null,
+      completedAt: Date.now(),
+    });
+
+    track("quiz_submit", { lessonId: lesson.id, score: correct / lesson.quiz.length, misconception: missed });
+    track("lesson_complete", { lessonId: lesson.id, score: correct / lesson.quiz.length, xpAwarded: xp });
+    setSubmitted(true);
+    if (missed) {
+      setActiveMisconception(missed);
+      setTutorOpen(true);
+      track("misconception_detected", { misconception: missed });
+    }
   }
 
   return (
-    <div>
-      {lesson.bodyMd.replace(/\*\*/g, "")}
+    <div className="p-5 pb-24">
+      <p className="text-xs font-semibold uppercase tracking-wide text-brand-blue">Lesson {lesson.order}</p>
+      <h1 className="text-2xl font-bold text-brand-navy">{lesson.title}</h1>
+
+      <div className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-slate-700">
+        {lesson.bodyMd.replace(/\*\*/g, "")}
+      </div>
 
       <div className="relative mt-5 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-blue/10 to-brand-navy/5 px-4 py-4">
         <span
@@ -64,19 +111,21 @@ export default function Lesson() {
       </div>
 
       <h2 className="mt-8 text-lg font-bold text-brand-navy">Check yourself</h2>
-
       {lesson.quiz.map((q) => (
-        <div key={q.id} className="mt-3">
-          {q.options.map((opt, i) => {
-            const chosen = answers[q.id] === i;
-            const isMissedPick = submitted && chosen && i !== q.answerIdx;
-            return (
-              <button
-                key={i}
-                disabled={submitted}
-                onClick={() => setAnswers({ ...answers, [q.id]: i })}
-                className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-xl border-2 px-4 py-3 text-left text-[15px] transition-all duration-200 ${
-                  isRight
+        <div key={q.id} className="mt-4">
+          <p className="font-medium">{q.prompt}</p>
+          <div className="mt-2 space-y-2">
+            {q.options.map((opt, i) => {
+              const chosen = answers[q.id] === i;
+              const isRight = submitted && i === q.answerIdx;
+              const isMissedPick = submitted && chosen && i !== q.answerIdx;
+              return (
+                <button
+                  key={i}
+                  disabled={submitted}
+                  onClick={() => setAnswers({ ...answers, [q.id]: i })}
+                  className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-xl border-2 px-4 py-3 text-left text-[15px] transition-all duration-200 ${
+                    isRight
                       ? "border-emerald-400 bg-emerald-50 font-medium text-emerald-900"
                       : isMissedPick
                         ? "border-amber-400 bg-amber-50 font-medium text-amber-900"
@@ -85,14 +134,15 @@ export default function Lesson() {
                           : chosen
                             ? "border-brand-blue bg-brand-blue/10 font-medium text-brand-navy"
                             : "border-slate-200 active:scale-[0.98]"
-                }`}
-              >
-                <span>{opt}</span>
-                {isRight && <span aria-hidden="true" className="shrink-0 text-lg">✓</span>}
-                {isMissedPick && <span aria-hidden="true" className="shrink-0 text-lg">🤔</span>}
-              </button>
-            );
-          })}
+                  }`}
+                >
+                  <span>{opt}</span>
+                  {isRight && <span aria-hidden="true" className="shrink-0 text-lg">✓</span>}
+                  {isMissedPick && <span aria-hidden="true" className="shrink-0 text-lg">🤔</span>}
+                </button>
+              );
+            })}
+          </div>
         </div>
       ))}
 
@@ -131,6 +181,15 @@ export default function Lesson() {
         >
           Talk it through with your tutor
         </button>
+      )}
+
+      {tutorOpen && (
+        <TutorChat
+          lesson={lesson}
+          user={user}
+          misconceptionId={activeMisconception}
+          onClose={() => setTutorOpen(false)}
+        />
       )}
     </div>
   );
