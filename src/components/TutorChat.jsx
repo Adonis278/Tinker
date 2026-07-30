@@ -178,7 +178,12 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
 
         <div
           className="flex items-end gap-2 border-t border-slate-100 px-3 pt-2"
-          style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+          // calc(+), not max(): max() collapses to 8px on any device reporting a
+          // 0 inset (no home indicator, or Safari's toolbar already covering it),
+          // which left the input row flush against the bottom edge. Adding gives
+          // real breathing room either way. Explicit 0px fallback so calc() still
+          // resolves where env() is unsupported.
+          style={{ paddingBottom: "calc(0.625rem + env(safe-area-inset-bottom, 0px))" }}
         >
           <input
             className="min-h-[44px] flex-1 rounded-full border border-slate-200 px-4 py-2.5 text-[15px] focus:border-brand-blue focus:outline-none focus-visible:ring focus-visible:ring-brand-blue/20"
