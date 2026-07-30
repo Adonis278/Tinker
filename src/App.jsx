@@ -14,21 +14,25 @@ export default function App() {
 
   return (
     <div className="mx-auto flex min-h-full max-w-md flex-col bg-white shadow-sm">
-      <header className="flex items-center justify-between border-b px-4 py-3">
-        <Link to="/" className="text-lg font-bold text-brand-navy">
+      <header className="flex items-center justify-between border-b px-4">
+        <Link to="/" className="flex min-h-[44px] items-center text-lg font-bold text-brand-navy">
           Tinker
         </Link>
         {user && (
           <nav className="flex gap-4 text-sm">
             <Link
               to="/lesson/algebra-01"
-              className={pathname.startsWith("/lesson") ? "font-semibold text-brand-blue" : "text-slate-500"}
+              className={`flex min-h-[44px] items-center ${
+                pathname.startsWith("/lesson") ? "font-semibold text-brand-blue" : "text-slate-500"
+              }`}
             >
               Learn
             </Link>
             <Link
               to="/dashboard"
-              className={pathname === "/dashboard" ? "font-semibold text-brand-blue" : "text-slate-500"}
+              className={`flex min-h-[44px] items-center ${
+                pathname === "/dashboard" ? "font-semibold text-brand-blue" : "text-slate-500"
+              }`}
             >
               Progress
             </Link>
