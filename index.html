@@ -2,8 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- viewport-fit=cover is required for env(safe-area-inset-*) to report
+         anything but 0 on notched iPhones. TutorChat's input row pads itself
+         with safe-area-inset-bottom, so without this it sits under the home
+         indicator. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#008AD1" />
     <title>Tinker — Learn in your language, through what you love</title>
+    <!-- Inline so there is no extra request and no binary asset in the repo.
+         Without any icon the browser requests /favicon.ico and logs a 404. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23008AD1'/%3E%3Cpath d='M8 10h16M16 10v13' stroke='white' stroke-width='3.4' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
   </head>
   <body>
     <div id="root"></div>
