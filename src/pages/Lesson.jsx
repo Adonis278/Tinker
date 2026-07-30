@@ -102,7 +102,7 @@ export default function Lesson() {
         <div className="flex items-start gap-3 pl-2">
           <span
             aria-hidden="true"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-2xl shadow-sm ring-1 ring-brand-blue/20"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-white text-2xl shadow-sm ring-1 ring-brand-blue/20"
           >
             {anchorEmoji}
           </span>
@@ -127,9 +127,11 @@ export default function Lesson() {
               return (
                 <button
                   key={i}
+                  role="button"
+                  aria-disabled={submitted}
                   disabled={submitted}
                   onClick={() => setAnswers({ ...answers, [q.id]: i })}
-                  className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-xl border-2 px-4 py-3 text-left text-[15px] transition-all duration-200 ${
+                  className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-xl border-2 px-6 py-3 text-left text-[15px] transition-all duration-200 ${
                     isRight
                       ? "border-emerald-400 bg-emerald-50 font-medium text-emerald-900"
                       : isMissedPick

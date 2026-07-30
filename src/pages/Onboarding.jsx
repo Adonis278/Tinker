@@ -46,7 +46,7 @@ export default function Onboarding() {
 
           <label className="mt-6 block text-sm font-medium">What should we call you?</label>
           <input
-            className="mt-1 w-full rounded-lg border px-3 py-2"
+            className="mt-1 w-full rounded-lg border px-3 py-2 focus:border-brand-blue focus:outline-none focus-visible:ring focus-visible:ring-brand-blue/20"
             value={form.displayName}
             onChange={(e) => setForm({ ...form, displayName: e.target.value })}
             placeholder="Your name"
@@ -58,7 +58,7 @@ export default function Onboarding() {
               <button
                 key={b}
                 onClick={() => setForm({ ...form, ageBand: b })}
-                className={`min-h-[44px] flex-1 rounded-lg border py-2 text-sm transition-colors ${
+                className={`min-h-[44px] flex-1 rounded-lg border py-2 text-sm transition-colors focus-visible:ring focus-visible:ring-brand-blue/20 ${
                   form.ageBand === b ? "border-brand-blue bg-blue-50 font-semibold text-brand-blue" : ""
                 }`}
               >
@@ -80,7 +80,7 @@ export default function Onboarding() {
               <button
                 key={l.code}
                 onClick={() => setForm({ ...form, nativeLanguage: l.code })}
-                className={`w-full rounded-lg border px-4 py-3 text-left ${
+                className={`w-full rounded-lg border px-4 py-3 text-left focus-visible:ring focus-visible:ring-brand-blue/20 ${
                   form.nativeLanguage === l.code ? "border-brand-blue bg-blue-50 font-semibold text-brand-blue" : ""
                 }`}
               >
@@ -121,7 +121,7 @@ export default function Onboarding() {
                   key={d.id}
                   onClick={() => toggleInterest(d.id)}
                   aria-pressed={on}
-                  className={`relative flex min-h-[104px] flex-col items-center justify-center gap-2 rounded-2xl border-2 px-3 py-5 transition-all duration-150 active:scale-95 ${
+                  className={`relative flex min-h-[104px] flex-col items-center justify-center gap-2 rounded-2xl border-2 px-3 py-5 transition-all duration-150 active:scale-95 focus-visible:ring focus-visible:ring-brand-blue/20 ${
                     on
                       ? "scale-[1.02] border-brand-blue bg-brand-blue/10 shadow-md shadow-brand-blue/20"
                       : dimmed
@@ -158,14 +158,14 @@ export default function Onboarding() {
 
       <div className="mt-6 flex gap-2">
         {step > 0 && (
-          <button onClick={() => setStep(step - 1)} className="rounded-lg border px-4 py-3 text-sm">
+          <button onClick={() => setStep(step - 1)} className="rounded-lg border px-4 py-3 text-sm focus-visible:ring focus-visible:ring-brand-blue/20">
             Back
           </button>
         )}
         <button
           onClick={() => (step === 2 ? finish() : setStep(step + 1))}
           disabled={step === 2 && form.interests.length === 0}
-          className="flex-1 rounded-lg bg-brand-blue py-3 font-semibold text-white disabled:opacity-40"
+          className="flex-1 rounded-lg bg-brand-blue py-3 font-semibold text-white disabled:opacity-40 focus-visible:ring focus-visible:ring-brand-blue/20"
         >
           {step === 2 ? "Start learning" : "Continue"}
         </button>

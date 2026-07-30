@@ -23,7 +23,8 @@ body {
   height: 7px;
   border-radius: 9999px;
   background: #94a3b8;
-  animation: tinker-bounce 1s infinite ease-in-out;
+  /* slowed slightly for readability */
+  animation: tinker-bounce 1.2s infinite ease-in-out;
 }
 @keyframes tinker-bounce {
   0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
@@ -54,10 +55,21 @@ body {
   to { transform: translateY(0) scale(1); opacity: 1; }
 }
 
+/* Focus ring helper for keyboard users */
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 6px rgba(0, 138, 209, 0.12);
+  border-radius: 12px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .tinker-dot,
   .tinker-shimmer::after,
   .tinker-pop {
     animation: none;
+  }
+  /* reduce motion: remove transitions for progress bars */
+  .no-motion-transition {
+    transition: none !important;
   }
 }

@@ -90,7 +90,7 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
           <button
             onClick={onClose}
             aria-label="Close chat"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 focus-visible:ring focus-visible:ring-brand-blue/20"
           >
             ✕
           </button>
@@ -103,6 +103,9 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
               <div key={i} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
                 <div className={`flex max-w-[80%] flex-col gap-1.5 ${isUser ? "items-end" : "items-start"}`}>
                   <div
+                    aria-live={!isUser ? "polite" : undefined}
+                    role={!isUser ? "status" : undefined}
+                    aria-atomic={!isUser ? "true" : undefined}
                     className={`px-4 py-3 text-[15px] leading-relaxed ${
                       isUser
                         ? "rounded-2xl rounded-br-md bg-brand-navy text-white"
@@ -133,11 +136,12 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
             );
           })}
           {busy && (
-            <div className="flex justify-start">
-              <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3.5">
-                <span className="tinker-dot" />
-                <span className="tinker-dot" style={{ animationDelay: "0.15s" }} />
-                <span className="tinker-dot" style={{ animationDelay: "0.3s" }} />
+            <div className="flex justify-start" role="status" aria-live="polite">
+              <div className="flex items-center gap-3 rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3.5">
+                <span className="tinker-dot" aria-hidden="true" />
+                <span className="tinker-dot" aria-hidden="true" style={{ animationDelay: "0.15s" }} />
+                <span className="tinker-dot" aria-hidden="true" style={{ animationDelay: "0.3s" }} />
+                <span className="sr-only">Tutor is typing</span>
               </div>
             </div>
           )}
@@ -149,7 +153,7 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
           style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
         >
           <input
-            className="min-h-[44px] flex-1 rounded-full border border-slate-200 px-4 py-2.5 text-[15px] focus:border-brand-blue focus:outline-none"
+            className="min-h-[44px] flex-1 rounded-full border border-slate-200 px-4 py-2.5 text-[15px] focus:border-brand-blue focus:outline-none focus-visible:ring focus-visible:ring-brand-blue/20"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
@@ -159,7 +163,7 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
             onClick={send}
             disabled={busy || !input.trim()}
             aria-label="Send"
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue font-semibold text-white transition-transform active:scale-95 disabled:opacity-40"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue font-semibold text-white transition-transform active:scale-95 disabled:opacity-40 focus-visible:ring focus-visible:ring-brand-blue/20"
           >
             ↑
           </button>
