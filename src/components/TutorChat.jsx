@@ -30,7 +30,14 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   const sheetRef = useRef(null);
   const overlayRef = useRef(null);
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), [messages, busy]);
+  // Block body, NOT a concise arrow: scrollIntoView returns a Promise in
+  // current Chrome, and a concise arrow would hand that Promise back to React
+  // as the effect's cleanup. React then calls it, throws "destroy is not a
+  // function", and — with no error boundary above us — unmounts the whole app
+  // to a blank screen the moment the tutor opens.
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, busy]);
 
   // Keep the sheet inside the visible viewport when the mobile keyboard opens.
   useEffect(() => {
