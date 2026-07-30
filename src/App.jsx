@@ -40,7 +40,10 @@ export default function App() {
         )}
       </header>
 
-      <main className="flex-1">
+      {/* flex column so a page using h-full + flex-1 (Onboarding) can actually
+          stretch — a percentage height against an auto-height flex item
+          collapses, which left Onboarding's footer floating mid-screen. */}
+      <main className="flex flex-1 flex-col">
         <Routes>
           <Route path="/" element={user ? <Navigate to="/lesson/algebra-01" replace /> : <Onboarding />} />
           <Route path="/onboarding" element={<Onboarding />} />

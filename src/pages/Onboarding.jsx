@@ -31,8 +31,11 @@ export default function Onboarding() {
     nav("/lesson/algebra-01");
   }
 
+  // flex-1, not h-full: as a flex item a percentage height resolves against an
+  // indefinite main size and collapses to content height, which left the footer
+  // floating mid-screen with dead space below it.
   return (
-    <div className="flex h-full flex-col p-5">
+    <div className="flex flex-1 flex-col p-5">
       <div className="mb-6 flex gap-1">
         {[0, 1, 2].map((i) => (
           <div key={i} className={`h-1 flex-1 rounded ${i <= step ? "bg-brand-blue" : "bg-slate-200"}`} />
