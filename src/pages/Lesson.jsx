@@ -91,7 +91,7 @@ export default function Lesson() {
       <h1 className="text-2xl font-bold text-brand-navy">{lesson.title}</h1>
 
       <div className="mt-4 whitespace-pre-line text-[15px] leading-relaxed text-slate-700">
-        {lesson.bodyMd.replace(/\*\*/g, "")}
+        {renderBodyMd(lesson.bodyMd)}
       </div>
 
       <div className="relative mt-5 overflow-hidden rounded-2xl bg-gradient-to-br from-brand-blue/10 to-brand-navy/5 px-4 py-4">
@@ -202,4 +202,25 @@ export default function Lesson() {
       )}
     </div>
   );
+}
+
+/**
+ * bodyMd is markdown, but we only ever need the two inline marks P3 actually
+ * writes: **bold** for equations and *emphasis* for stressed words. Previously
+ * ** was stripped (equations rendered flat) and single * leaked through as
+ * literal asterisks on screen. Not a markdown parser — deliberately narrow.
+ * Plain segments stay strings so the parent's whitespace-pre-line still works.
+ */
+function renderBodyMd(text) {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, i) => {
+    if (/^\*\*[^*]+\*\*$/.test(part)) {
+      return (
+        <strong key={i} className="font-semibold text-brand-navy">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    if (/^\*[^*]+\*$/.test(part)) return <em key={i}>{part.slice(1, -1)}</em>;
+    return part;
+  });
 }
