@@ -67,7 +67,7 @@ export default function Dashboard() {
             role="progressbar"
             aria-valuenow={user.xp ?? 0}
             aria-valuemax={next}
-            className="h-full rounded-full bg-gradient-to-r from-brand-blue to-brand-navy transition-[width] duration-1000 ease-out"
+            className="no-motion-transition h-full rounded-full bg-gradient-to-r from-brand-blue to-brand-navy transition-[width] duration-1000 ease-out"
             style={{ width: `${barPct}%` }}
           />
         </div>
@@ -134,7 +134,7 @@ export default function Dashboard() {
         </div>
         <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/20">
           <div
-            className="h-full rounded-full bg-white transition-[width] duration-1000 ease-out"
+            className="no-motion-transition h-full rounded-full bg-white transition-[width] duration-1000 ease-out"
             style={{ width: `${regionPct}%` }}
           />
         </div>
