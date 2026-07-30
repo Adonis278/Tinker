@@ -6,6 +6,10 @@ import { track } from "../firebase.js";
  * OWNER: P1 (the skin) — P2 owns what comes back from askTutor().
  * Bottom sheet chat. The "anchor" and "model" chips are demo gold: they make
  * the invisible AI work visible to a judge. Keep them.
+ *
+ * Keyboard behaviour: the sheet is sized against the *visual* viewport
+ * (dvh + visualViewport listener), so opening the mobile keyboard resizes
+ * the sheet instead of jumping it. Input row is safe-area padded.
  */
 export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   const opener = misconceptionId
@@ -16,8 +20,22 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const endRef = useRef(null);
+  const sheetRef = useRef(null);
 
-  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), [messages]);
+  useEffect(() => endRef.current?.scrollIntoView({ behavior: "smooth" }), [messages, busy]);
+
+  // Keep the sheet inside the visible viewport when the mobile keyboard opens.
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!vv) return;
+    const onResize = () => {
+      if (sheetRef.current) {
+        sheetRef.current.style.maxHeight = `${Math.round(vv.height * 0.85)}px`;
+      }
+    };
+    vv.addEventListener("resize", onResize);
+    return () => vv.removeEventListener("resize", onResize);
+  }, []);
 
   async function send() {
     const text = input.trim();
@@ -53,54 +71,101 @@ export default function TutorChat({ lesson, user, misconceptionId, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/40" onClick={onClose}>
       <div
-        className="flex h-[80vh] flex-col rounded-t-2xl bg-white"
+        ref={sheetRef}
+        className="flex flex-col rounded-t-3xl bg-white shadow-2xl"
+        style={{ height: "85dvh", maxHeight: "85dvh" }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b px-4 py-3">
-          <div>
-            <p className="font-bold text-brand-navy">Your Tinker tutor</p>
-            <p className="text-xs text-slate-500">Guides you. Never does it for you.</p>
+        <div className="flex items-center gap-3 border-b border-slate-100 px-4 py-3">
+          <span
+            aria-hidden="true"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-blue/10 text-lg"
+          >
+            💬
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold leading-tight text-brand-navy">Your Tinker tutor</p>
+            <p className="text-xs leading-tight text-slate-500">Guides you. Never does it for you.</p>
           </div>
-          <button onClick={onClose} className="text-2xl leading-none text-slate-400">
-            ×
+          <button
+            onClick={onClose}
+            aria-label="Close chat"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 focus-visible:ring focus-visible:ring-brand-blue/20"
+          >
+            ✕
           </button>
         </div>
 
-        <div className="flex-1 space-y-3 overflow-y-auto p-4">
-          {messages.map((m, i) => (
-            <div key={i} className={m.role === "user" ? "text-right" : ""}>
-              <div
-                className={`inline-block max-w-[85%] rounded-2xl px-3 py-2 text-[15px] ${
-                  m.role === "user" ? "bg-brand-blue text-white" : "bg-slate-100"
-                }`}
-              >
-                {m.content}
-              </div>
-              {m.meta?.anchorUsed && (
-                <div className="mt-1 flex gap-1 text-[10px] text-slate-400">
-                  <span className="rounded bg-blue-50 px-1.5 py-0.5 text-brand-blue">
-                    via {m.meta.anchorUsed}
-                  </span>
-                  {m.meta.modelUsed && <span className="rounded bg-slate-100 px-1.5 py-0.5">{m.meta.modelUsed}</span>}
-                  {m.meta.translated && <span className="rounded bg-slate-100 px-1.5 py-0.5">translated</span>}
+        <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
+          {messages.map((m, i) => {
+            const isUser = m.role === "user";
+            return (
+              <div key={i} className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
+                <div className={`flex max-w-[80%] flex-col gap-1.5 ${isUser ? "items-end" : "items-start"}`}>
+                  <div
+                    aria-live={!isUser ? "polite" : undefined}
+                    role={!isUser ? "status" : undefined}
+                    aria-atomic={!isUser ? "true" : undefined}
+                    className={`px-4 py-3 text-[15px] leading-relaxed ${
+                      isUser
+                        ? "rounded-2xl rounded-br-md bg-brand-navy text-white"
+                        : "rounded-2xl rounded-bl-md bg-slate-100 text-slate-900"
+                    }`}
+                  >
+                    {m.content}
+                  </div>
+                  {m.meta?.anchorUsed && (
+                    <div className="flex flex-wrap gap-1.5 pl-1">
+                      <span className="rounded-full bg-brand-blue/10 px-2.5 py-0.5 text-[11px] font-semibold text-brand-blue">
+                        via {m.meta.anchorUsed}
+                      </span>
+                      {m.meta.modelUsed && (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-500">
+                          {m.meta.modelUsed}
+                        </span>
+                      )}
+                      {m.meta.translated && (
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-semibold text-slate-500">
+                          translated
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+            );
+          })}
+          {busy && (
+            <div className="flex justify-start" role="status" aria-live="polite">
+              <div className="flex items-center gap-3 rounded-2xl rounded-bl-md bg-slate-100 px-4 py-3.5">
+                <span className="tinker-dot" aria-hidden="true" />
+                <span className="tinker-dot" aria-hidden="true" style={{ animationDelay: "0.15s" }} />
+                <span className="tinker-dot" aria-hidden="true" style={{ animationDelay: "0.3s" }} />
+                <span className="sr-only">Tutor is typing</span>
+              </div>
             </div>
-          ))}
-          {busy && <div className="text-sm text-slate-400">thinking…</div>}
+          )}
           <div ref={endRef} />
         </div>
 
-        <div className="flex gap-2 border-t p-3">
+        <div
+          className="flex items-end gap-2 border-t border-slate-100 px-3 pt-2"
+          style={{ paddingBottom: "max(0.5rem, env(safe-area-inset-bottom))" }}
+        >
           <input
-            className="flex-1 rounded-full border px-4 py-2"
+            className="min-h-[44px] flex-1 rounded-full border border-slate-200 px-4 py-2.5 text-[15px] focus:border-brand-blue focus:outline-none focus-visible:ring focus-visible:ring-brand-blue/20"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && send()}
             placeholder="Type what you're thinking…"
           />
-          <button onClick={send} disabled={busy} className="rounded-full bg-brand-blue px-5 font-semibold text-white">
-            Send
+          <button
+            onClick={send}
+            disabled={busy || !input.trim()}
+            aria-label="Send"
+            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-blue font-semibold text-white transition-transform active:scale-95 disabled:opacity-40 focus-visible:ring focus-visible:ring-brand-blue/20"
+          >
+            ↑
           </button>
         </div>
       </div>
