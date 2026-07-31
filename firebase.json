@@ -10,12 +10,14 @@
     ],
     "headers": [
       {
-        "source": "/assets/**",
-        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+        "comment": "ORDER MATTERS: Firebase applies every matching rule and lets LATER ones override, so the broad rule goes first and the asset rule below overrides it. A '/index.html' rule alone does not work here — header rules match the REQUEST path, and every route ('/', '/learn', '/study') is rewritten to index.html rather than requested by name, so the entry point silently inherited a 1-hour default and deploys took an hour to reach returning visitors.",
+        "source": "**",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
       },
       {
-        "source": "/index.html",
-        "headers": [{ "key": "Cache-Control", "value": "no-cache" }]
+        "comment": "Hashed filenames, so these can never go stale. Cache hard.",
+        "source": "/assets/**",
+        "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
       }
     ]
   },
