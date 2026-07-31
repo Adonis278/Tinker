@@ -84,7 +84,9 @@ Write "title" and "summary" in English. Write "anchor" in ${langName}.
 Return ONLY a JSON object, no markdown fences:
 {"courseTitle":"<3-5 words>","lessons":[{"title":"<5 words max>","summary":"<ONE short sentence>","anchor":"<the idea inside the learner's world, in ${langName}, MAX 25 WORDS>","check":"<one short question>","citations":[<passage numbers, or empty>]}]}
 
-Produce exactly 3 lessons, ordered so each builds on the last. Be concise — brevity is required, not optional.`;
+Produce exactly 3 lessons, ordered so each builds on the last. Be concise — brevity is required, not optional.
+
+CRITICAL: Do not think out loud, do not explain yourself, do not write anything before or after the JSON. Your entire reply must start with { and end with }. Any reasoning text will break the parser.`;
 
   // These models drop out of JSON often enough that one attempt is a coin
   // flip. A single retry turns an occasional broken plan into a rare one, and
@@ -107,13 +109,16 @@ Produce exactly 3 lessons, ordered so each builds on the last. Be concise — br
       // default. At 1600 tokens every good model timed out and the chain fell
       // through to the 8B fallback, which wrote fluent-sounding Kiswahili about
       // the wrong subject entirely.
-      { maxTokens: 1100, timeoutMs: 30000 }
+      // Headroom on purpose. The primary model reasons before answering, and at
+    // 1100 tokens that reasoning ate the budget and truncated the JSON
+    // mid-string, where even bracket repair cannot recover it.
+    { maxTokens: 2400, timeoutMs: 30000 }
     );
     model = res.model;
     parsed = parseCourseJson(res.content);
   }
 
-  if (!parsed) parsed = FALLBACK_COURSE;
+  if (!parsed) parsed = fallbackCourse(topic);
   return {
     ...parsed,
     modelUsed: model,
@@ -122,20 +127,50 @@ Produce exactly 3 lessons, ordered so each builds on the last. Be concise — br
   };
 }
 
-const FALLBACK_COURSE = {
-  courseTitle: "Your learning plan",
-  lessons: [
-    {
-      id: "gen-1",
-      order: 1,
-      title: "Getting oriented",
-      summary: "We had trouble drafting a full plan. Ask the tutor anything and it will start from where you are.",
-      anchor: "",
-      check: "What part of this topic feels least clear right now?",
-      citations: [],
-    },
-  ],
-};
+/**
+ * Last resort when the model will not return usable JSON twice in a row.
+ *
+ * This used to be a single card apologising that we could not draft a plan,
+ * which is the worst possible thing to show: it tells the learner the product
+ * is broken and leaves them nowhere to go. A generic-but-real three-lesson
+ * scaffold is still a usable session — the tutor behind each lesson is the
+ * part that actually teaches, and it is unaffected by this failure.
+ */
+function fallbackCourse(topic = "this topic") {
+  const t = String(topic).trim() || "this topic";
+  return {
+    courseTitle: t.length > 40 ? t.slice(0, 40).trim() + "…" : t,
+    lessons: [
+      {
+        id: "gen-1",
+        order: 1,
+        title: "What this actually means",
+        summary: `Get clear on what ${t} is really about, stripped of jargon.`,
+        anchor: "",
+        check: `In your own words — what is ${t} actually about?`,
+        citations: [],
+      },
+      {
+        id: "gen-2",
+        order: 2,
+        title: "How it behaves",
+        summary: "The rules it follows, and why those rules hold.",
+        anchor: "",
+        check: "What would break if that rule stopped applying?",
+        citations: [],
+      },
+      {
+        id: "gen-3",
+        order: 3,
+        title: "Putting it to work",
+        summary: "Where this shows up, and how you would actually use it.",
+        anchor: "",
+        check: "Where would you meet this outside a classroom?",
+        citations: [],
+      },
+    ],
+  };
+}
 
 /**
  * Parse a course out of a model reply, or return null so the caller can retry.
