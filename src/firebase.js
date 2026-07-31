@@ -12,7 +12,15 @@
  */
 
 import { initializeApp } from "firebase/app";
-import { getAuth, signInAnonymously, onAuthStateChanged } from "firebase/auth";
+import {
+  getAuth,
+  signInAnonymously,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+  linkWithPopup,
+  signOut as fbSignOut,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getAnalytics, isSupported, logEvent } from "firebase/analytics";
 import { MOCK_STORE } from "./lib/env.js";
@@ -68,6 +76,56 @@ export async function ensureSignedIn() {
 export function onUser(cb) {
   if (!live) return () => {};
   return onAuthStateChanged(auth, cb);
+}
+
+/**
+ * Sign in with Google.
+ *
+ * If the learner is already here anonymously we LINK rather than replace, so
+ * the progress they built before signing in survives — losing it at the moment
+ * someone commits to an account is the worst possible time to lose it.
+ */
+export async function signInWithGoogle() {
+  if (!live) return { ok: false, error: "auth-unavailable" };
+  const provider = new GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: "select_account" });
+  try {
+    const current = auth.currentUser;
+    if (current?.isAnonymous) {
+      try {
+        const cred = await linkWithPopup(current, provider);
+        return { ok: true, user: cred.user, upgraded: true };
+      } catch (err) {
+        // Already-in-use means this Google account has its own history; sign
+        // into that instead of stranding the learner.
+        if (err?.code !== "auth/credential-already-in-use") throw err;
+      }
+    }
+    const cred = await signInWithPopup(auth, provider);
+    return { ok: true, user: cred.user, upgraded: false };
+  } catch (err) {
+    if (err?.code === "auth/popup-closed-by-user" || err?.code === "auth/cancelled-popup-request") {
+      return { ok: false, error: "cancelled" };
+    }
+    console.warn("[firebase] Google sign-in failed", err);
+    return { ok: false, error: err?.code ?? "unknown" };
+  }
+}
+
+export async function signOut() {
+  if (live) await fbSignOut(auth);
+}
+
+export function currentAccount() {
+  if (!live || !auth.currentUser) return null;
+  const u = auth.currentUser;
+  return {
+    uid: u.uid,
+    isAnonymous: u.isAnonymous,
+    displayName: u.displayName,
+    email: u.email,
+    photoURL: u.photoURL,
+  };
 }
 
 /**
