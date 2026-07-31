@@ -110,9 +110,12 @@ export default function Dashboard() {
         <div className="mt-2 flex flex-wrap gap-2">
           {(user.interests ?? []).map((id) => {
             const d = INTEREST_DOMAINS.find((x) => x.id === id);
+            // Show what the learner actually typed, not the generic
+            // "Something else" — it's their expertise, so name it.
+            const label = id === "other" ? user.otherInterest || d?.label : d?.label;
             return (
               <span key={id} className="rounded-full bg-brand-blue/10 px-3 py-1.5 text-sm font-medium text-brand-blue">
-                {d?.emoji} {d?.label}
+                {d?.emoji} {label}
               </span>
             );
           })}

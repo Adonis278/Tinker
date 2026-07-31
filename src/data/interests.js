@@ -14,6 +14,11 @@ export const INTEREST_DOMAINS = [
   { id: "fashion", label: "Fashion", emoji: "\u{1F457}" },
   { id: "cars", label: "Cars & Machines", emoji: "\u{1F697}" },
   { id: "faith", label: "Faith & Community", emoji: "\u{1F91D}" },
+  // Free-text escape hatch. Ten fixed options would quietly tell most of the
+  // world their expertise doesn't count — fishing, tailoring, welding, herding,
+  // hairdressing, motorbike repair. The learner types it and the AI anchors in
+  // whatever they wrote, so the list stops being a ceiling.
+  { id: "other", label: "Something else", emoji: "✍️", custom: true },
 ];
 
 export const LANGUAGES = [

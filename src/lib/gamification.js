@@ -36,10 +36,18 @@ export function awardQuiz({ correctCount, total }) {
   return XP_PER_CORRECT * correctCount + (perfect ? XP_PER_LESSON : 0);
 }
 
-/** Returns the updated streak given the last active date. Pure — pass today in for tests. */
+/**
+ * Returns the updated streak given the last active date. Pure — pass `today` in
+ * for tests.
+ *
+ * `yesterday` is derived from the `today` ARGUMENT, not from Date.now(). It
+ * used to read the real clock, which made the function only accidentally pure:
+ * passing any date other than the actual today gave a wrong answer, so the
+ * streak logic could not be tested at all.
+ */
 export function nextStreak(lastActiveDate, streak = 0, today = new Date().toISOString().slice(0, 10)) {
   if (lastActiveDate === today) return streak;
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const yesterday = new Date(Date.parse(`${today}T00:00:00Z`) - 86400000).toISOString().slice(0, 10);
   return lastActiveDate === yesterday ? streak + 1 : 1;
 }
 
