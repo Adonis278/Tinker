@@ -15,7 +15,7 @@ const ENDPOINT = import.meta.env.VITE_TUTOR_ENDPOINT;
 /**
  * @returns {Promise<{reply,anchorUsed,misconceptionDetected,hintLevel,modelUsed,translated,latencyMs}>}
  */
-export async function askTutor({ uid, lessonId, conceptId, message, history = [], learner, context }) {
+export async function askTutor({ uid, lessonId, conceptId, message, history = [], learner, context, sourceId = null }) {
   if (USE_MOCKS) return mockTutor({ message, learner, context, history });
 
   const started = Date.now();
@@ -31,6 +31,9 @@ export async function askTutor({ uid, lessonId, conceptId, message, history = []
         history: history.slice(-6),
         learner,
         context,
+        // When present the backend retrieves from the learner's own material
+        // and returns the passages it actually used.
+        sourceId,
       }),
     });
     return await res.json();
