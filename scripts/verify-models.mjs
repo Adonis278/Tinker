@@ -20,10 +20,10 @@ import { fileURLToPath } from "node:url";
 import { MODEL_CHAIN } from "../functions/models.js";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const envPath = path.join(root, "functions", ".env");
+const envPath = path.join(root, "functions", ".secret.local");
 
 if (!fs.existsSync(envPath)) {
-  console.error("Missing functions/.env — copy functions/.env.example and add your key.");
+  console.error("Missing functions/.secret.local — copy functions/.env.example and add your key.");
   process.exit(1);
 }
 const KEY = (fs.readFileSync(envPath, "utf8").match(/^NVIDIA_API_KEY=(.+)$/m) ?? [])[1]?.trim();

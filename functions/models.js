@@ -35,16 +35,18 @@ const COOLDOWN_MS = 60000;
 // Re-run `node scripts/verify-models.mjs` before the demo and put whichever
 // model is healthiest first.
 export const MODEL_CHAIN = [
-  // Answering in ~3.5s and holding the anchor well as of the last check.
+  // Best quality that is currently answering at all. Slow under load (4-23s).
   "nvidia/llama-3.3-nemotron-super-49b-v1",
-  // 6-8s when healthy, good anchoring. Was timing out at last check.
-  "meta/llama-3.1-70b-instruct",
-  // Strongest on paper but the free tier frequently returns 503
-  // "Worker local total request limit reached". Kept as opportunistic backup.
-  "meta/llama-3.3-70b-instruct",
-  // ~1.4s and has never failed. Weaker anchoring, but it always answers —
-  // which is the entire point of a last resort.
+  // SECOND ON PURPOSE, despite being the smallest. It answers in ~3s and has
+  // never once failed, so if the model above stalls we recover almost
+  // instantly. The 70Bs used to sit here, and when both went down under
+  // deadline-night load the chain burned 60 seconds on two corpses before
+  // reaching anything that worked. A fast certainty beats a slow maybe.
   "meta/llama-3.1-8b-instruct",
+  // Better quality than the 8B when the free tier has capacity, so still worth
+  // trying — but last, because they are the ones that stall.
+  "meta/llama-3.1-70b-instruct",
+  "meta/llama-3.3-70b-instruct",
 ];
 
 /** model id -> epoch ms until which we skip it */
