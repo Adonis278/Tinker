@@ -57,9 +57,9 @@ function available() {
   return ok.length ? ok : MODEL_CHAIN;
 }
 
-async function callOnce(model, messages, apiKey) {
+async function callOnce(model, messages, apiKey, { maxTokens = 400, timeoutMs = TIMEOUT_MS } = {}) {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(BASE_URL, {
       method: "POST",
@@ -74,7 +74,7 @@ async function callOnce(model, messages, apiKey) {
         messages,
         temperature: 0.6,
         top_p: 0.9,
-        max_tokens: 400,
+        max_tokens: maxTokens,
       }),
     });
 
@@ -95,11 +95,13 @@ async function callOnce(model, messages, apiKey) {
  * Try each available model in order. Returns { content, model }.
  * Throws only if every model in the chain failed.
  */
-export async function completeWithFailover(messages, apiKey) {
+export async function completeWithFailover(messages, apiKey, opts = {}) {
   const errors = [];
   for (const model of available()) {
     try {
-      const content = await callOnce(model, messages, apiKey);
+      // Generating a whole course needs more tokens and more patience than a
+      // single tutor turn, so callers can widen both.
+      const content = await callOnce(model, messages, apiKey, opts);
       if (content) return { content, model };
     } catch (err) {
       errors.push(`${model}: ${err.message}`);
