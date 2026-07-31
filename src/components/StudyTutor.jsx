@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { askTutor } from "../lib/tutor.js";
+import { recordTutorTurn } from "../lib/store.js";
 import { track } from "../firebase.js";
 
 /**
@@ -31,6 +32,7 @@ export default function StudyTutor({ lesson, user, session, onClose }) {
     const history = messages.map(({ role, content }) => ({ role, content }));
     setMessages((m) => [...m, { role: "user", content: msg }]);
     setBusy(true);
+    recordTutorTurn(); // feeds the "In My Own Words" badge
     track("tutor_message", { lessonId: lesson.id, grounded: Boolean(session.sourceId) });
 
     const res = await askTutor({

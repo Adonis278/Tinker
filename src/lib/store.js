@@ -21,6 +21,7 @@
 import { doc, getDoc, setDoc, collection, getDocs } from "firebase/firestore";
 import { MOCK_STORE } from "./env.js";
 import { db, live, ensureSignedIn } from "../firebase.js";
+import { nextStreak, streakBonus } from "./gamification.js";
 
 const KEY = "tinker.user";
 const PROGRESS_KEY = "tinker.progress";
@@ -90,7 +91,57 @@ export function resetAll() {
   localStorage.removeItem(PROGRESS_KEY);
 }
 
-/** Mock regional data until P3 ships src/data/regions.js. */
+/* ------------------------------------------------------------------ */
+/* Activity — the bridge between the pure game logic and the app       */
+/* ------------------------------------------------------------------ */
+/*
+ * These exist because the game logic was written but never called: the streak
+ * was set to 1 at onboarding and never moved, streakBonus awarded nothing, and
+ * three of the five badges tested fields that nothing in the app ever wrote,
+ * so they could not be earned at all. Anything gamification needs recorded
+ * goes through here.
+ */
+
+/**
+ * Call once per meaningful learning action (finishing a quiz, working through
+ * a lesson). Advances the streak, pays the streak bonus, and notes which
+ * language the learner is studying in.
+ */
+export function recordActivity({ language } = {}) {
+  const user = getUser();
+  if (!user) return null;
+
+  const today = new Date().toISOString().slice(0, 10);
+  const prev = user.streak ?? 0;
+  const streak = nextStreak(user.lastActiveDate, prev, today);
+  const bonus = streakBonus(prev, streak);
+
+  const langs = new Set(user.languagesUsed ?? []);
+  if (language) langs.add(language);
+
+  return saveUser({
+    streak,
+    lastActiveDate: today,
+    xp: (user.xp ?? 0) + bonus,
+    languagesUsed: [...langs],
+  });
+}
+
+/** Feeds the "In My Own Words" badge — earned by explaining, not by clicking. */
+export function recordTutorTurn() {
+  const user = getUser();
+  if (!user) return null;
+  return saveUser({ tutorTurns: (user.tutorTurns ?? 0) + 1 });
+}
+
+/** Feeds "Comeback": missed a concept, came back, got it right. */
+export function markComeback() {
+  const user = getUser();
+  if (!user || user.reviewedAndCorrected) return user;
+  return saveUser({ reviewedAndCorrected: true });
+}
+
+/** Mock regional data until P3's src/data/regions.js is wired in. */
 export function getRegion() {
   return { name: "Lagos", masteryPct: 14, learnerCount: 2481 };
 }
