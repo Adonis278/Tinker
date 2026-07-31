@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import lessons from "../data/lessons.sample.json";
 import { INTEREST_DOMAINS } from "../data/interests.js";
-import { getUser, saveUser, saveProgress } from "../lib/store.js";
-import { awardQuiz, scheduleReview } from "../lib/gamification.js";
+import { getUser, saveUser, saveProgress, getProgress, recordActivity, markComeback } from "../lib/store.js";
+import { awardQuiz, scheduleReview, countMisses } from "../lib/gamification.js";
 import { track } from "../firebase.js";
 import TutorChat from "../components/TutorChat.jsx";
 
@@ -57,7 +57,8 @@ export default function Lesson() {
   const anchorText = lesson.anchorPrompts[anchorId] ?? Object.values(lesson.anchorPrompts)[0];
   const anchorDomain = INTEREST_DOMAINS.find((d) => d.id === anchorId);
   const anchorEmoji = anchorDomain?.emoji ?? "✨";
-  const anchorLabel = anchorDomain?.label?.toLowerCase() ?? anchorId;
+  const anchorLabel =
+    anchorId === "other" ? user.otherInterest || "this" : anchorDomain?.label?.toLowerCase() ?? anchorId;
 
   function submit() {
     const correct = lesson.quiz.filter((q) => answers[q.id] === q.answerIdx).length;
@@ -66,13 +67,26 @@ export default function Lesson() {
 
     const xp = awardQuiz({ correctCount: correct, total: lesson.quiz.length });
     saveUser({ xp: (user.xp ?? 0) + xp });
+
+    // Weight the next review by how often this same misconception has bitten
+    // before — a concept missed repeatedly comes back sooner.
+    const previous = getProgress(lesson.id);
+    const priorMisses = previous.misconceptionsHit ?? [];
+    const history = missed ? [...priorMisses, missed] : priorMisses;
+
     saveProgress(lesson.id, {
       status: "complete",
       quizScore: correct / lesson.quiz.length,
-      misconceptionsHit: missed ? [missed] : [],
-      reviewDueAt: missed ? scheduleReview() : null,
+      misconceptionsHit: history,
+      reviewDueAt: missed ? scheduleReview({ missCount: countMisses(history, missed) }) : null,
       completedAt: Date.now(),
     });
+
+    // Streak, streak bonus and the language they're studying in.
+    recordActivity({ language: user.nativeLanguage });
+
+    // Came back to something they'd previously got wrong and cleared it.
+    if (correct === lesson.quiz.length && priorMisses.length) markComeback();
 
     track("quiz_submit", { lessonId: lesson.id, score: correct / lesson.quiz.length, misconception: missed });
     track("lesson_complete", { lessonId: lesson.id, score: correct / lesson.quiz.length, xpAwarded: xp });

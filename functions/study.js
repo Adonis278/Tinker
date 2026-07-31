@@ -10,7 +10,7 @@
 import { embedBatched } from "./embeddings.js";
 import { chunkText, retrieve, formatGrounding } from "./rag.js";
 import { completeWithFailover } from "./models.js";
-import { parseTutorJson } from "./prompts.js";
+import { parseTutorJson, describeAnchors } from "./prompts.js";
 
 const MAX_CHARS = 60000; // roughly a long chapter; keeps ingest under a few seconds
 
@@ -49,7 +49,8 @@ export async function generateCourse({ topic, learner, chunks = [], apiKey }) {
   const langName =
     { en: "English", sw: "Kiswahili", hi: "Hindi", yo: "Yoruba", sn: "Shona" }[learner?.nativeLanguage] ??
     "English";
-  const interests = (learner?.interests ?? []).join(", ") || "everyday situations";
+  // Includes any free-text domain the learner typed under "Something else".
+  const interests = describeAnchors(learner) || "- everyday household situations";
 
   const GOAL_NOTE = {
     exam: "They are preparing for an exam: be precise, drill the things examiners actually test, and keep each lesson tight.",
@@ -69,7 +70,10 @@ export async function generateCourse({ topic, learner, chunks = [], apiKey }) {
 ${GOAL_NOTE}
 ${LEVEL_NOTE}
 
-ANCHOR EVERY LESSON in a world the learner already knows: ${interests}. Each lesson's
+ANCHOR EVERY LESSON in a world the learner already knows:
+${interests}
+
+Each lesson's
 "anchor" field must explain that lesson's idea INSIDE one of those worlds — a real
 explanation, not a sentence with the word "football" inserted.
 

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getSession, clearSession } from "../lib/study.js";
-import { getUser } from "../lib/store.js";
+import { getUser, recordActivity } from "../lib/store.js";
 import { INTEREST_DOMAINS } from "../data/interests.js";
 import { track } from "../firebase.js";
 import StudyTutor from "../components/StudyTutor.jsx";
@@ -33,14 +33,23 @@ export default function Study() {
     );
   }
 
-  const anchorDomain = INTEREST_DOMAINS.find((d) => d.id === (user?.interests?.[0] ?? "cooking"));
+  const anchorId = user?.interests?.[0] ?? "cooking";
+  const anchorDomain = INTEREST_DOMAINS.find((d) => d.id === anchorId);
+  // A free-text domain shows what the learner typed, not "something else".
+  const anchorLabel =
+    anchorId === "other" ? user?.otherInterest || "this" : anchorDomain?.label?.toLowerCase() ?? "this";
   const pct = Math.round((done.size / session.lessons.length) * 100);
 
   function toggleDone(id) {
     setDone((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
-      if (!prev.has(id)) track("lesson_complete", { lessonId: id, generated: true });
+      if (!prev.has(id)) {
+        // Generated lessons count toward the streak too — otherwise the whole
+        // open-ended flow earns nothing.
+        recordActivity({ language: user?.nativeLanguage });
+        track("lesson_complete", { lessonId: id, generated: true });
+      }
       return next;
     });
   }
@@ -156,7 +165,7 @@ export default function Study() {
                         <div className="min-w-0">
                           <p className="mb-1 text-[10.5px] font-bold uppercase tracking-[0.14em]"
                             style={{ color: "rgb(var(--accent))" }}>
-                            Because you know {anchorDomain?.label?.toLowerCase() ?? "this"}
+                            Because you know {anchorLabel}
                           </p>
                           <p className="text-[14.5px] leading-relaxed" style={{ color: "rgb(var(--ink))" }}>{l.anchor}</p>
                         </div>

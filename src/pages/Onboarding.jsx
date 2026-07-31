@@ -34,6 +34,7 @@ export default function Onboarding() {
     ageBand: "17-22",
     nativeLanguage: "sw",
     interests: [],
+    otherInterest: "",
     goal: "school",
     level: "shaky",
   });
@@ -66,7 +67,8 @@ export default function Onboarding() {
     nav("/learn");
   }
 
-  const canAdvance = step !== 2 || form.interests.length > 0;
+  const needsOtherText = form.interests.includes("other") && !form.otherInterest.trim();
+  const canAdvance = step !== 2 || (form.interests.length > 0 && !needsOtherText);
 
   return (
     <div className="aurora flex min-h-[calc(100vh-57px)] flex-col px-5 pb-6 pt-6 sm:px-8">
@@ -195,6 +197,24 @@ export default function Onboarding() {
                 );
               })}
             </div>
+
+            {form.interests.includes("other") && (
+              <div className="tinker-pop mt-4">
+                <label className="block text-[14px] font-semibold" style={{ color: "rgb(var(--ink))" }}>
+                  What is it you know well?
+                </label>
+                <input
+                  className="field mt-2"
+                  value={form.otherInterest}
+                  onChange={(e) => setForm({ ...form, otherInterest: e.target.value })}
+                  placeholder="e.g. fishing, tailoring, motorbike repair, hair braiding…"
+                  autoFocus
+                />
+                <p className="mt-1.5 text-[12.5px]" style={{ color: "rgb(var(--ink-soft))" }}>
+                  Anything at all — we'll build your explanations inside it.
+                </p>
+              </div>
+            )}
           </section>
         )}
 

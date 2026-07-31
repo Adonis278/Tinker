@@ -27,11 +27,28 @@ const INTEREST_HINTS = {
   faith: "fair shares, community contributions, cycles and calendars",
 };
 
+/**
+ * Render the learner's anchor domains for the prompt.
+ *
+ * "other" is a free-text domain the learner typed themselves. A fixed list
+ * would quietly tell most of the world their expertise doesn't count — fishing,
+ * tailoring, welding, herding — so whatever they wrote is passed through
+ * verbatim and the model is told to treat it as the world to explain inside.
+ */
+export function describeAnchors(learner = {}) {
+  const lines = (learner.interests ?? []).map((id) => {
+    if (id === "other") {
+      const custom = String(learner.otherInterest ?? "").trim();
+      return custom ? `- ${custom} (the learner named this themselves — treat it as expert territory for them)` : null;
+    }
+    return `- ${id}: ${INTEREST_HINTS[id] ?? id}`;
+  });
+  return lines.filter(Boolean).join("\n");
+}
+
 export function buildSystemPrompt({ learner, context, writeInLanguage, grounding = "" }) {
   const lang = LANGUAGE_NAMES[learner.nativeLanguage] ?? "English";
-  const anchors = (learner.interests ?? [])
-    .map((i) => `- ${i}: ${INTEREST_HINTS[i] ?? i}`)
-    .join("\n");
+  const anchors = describeAnchors(learner);
 
   const misconceptions = (context.misconceptions ?? [])
     .map((m) => `- id "${m.id}": ${m.description} Signal: ${m.signal}`)

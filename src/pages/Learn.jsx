@@ -62,6 +62,7 @@ export default function Learn() {
       ageBand: user.ageBand,
       goal: user.goal,
       level: user.level,
+      otherInterest: user.otherInterest,
     };
 
     if (material.trim().length >= 80) {
